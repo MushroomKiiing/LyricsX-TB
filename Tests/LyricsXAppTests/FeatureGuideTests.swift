@@ -182,12 +182,14 @@ private struct GuideMotionTestHost: View {
 
     @Test func build279IntroducesTouchBarOnceWithoutEnablingItOrChangingExistingSettings() throws {
         let current = ["touchBar43", "backgroundTouchBar43"]
-        #expect(GuideContent.revision == "touch-bar-43")
+        #expect(GuideContent.revision == "touch-bar-public-preview-1")
         #expect(GuideContent.release43Pages.map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.42").map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.43").map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.41").map(\.id) == current + ["globalOffset42", "startup42"])
-        #expect(GuideContent.release43Pages.allSatisfy { $0.subtitle.contains("设置 → 开发者选项 → MacBook Pro Touch Bar") && $0.points.joined().contains("默认关闭") })
+        #expect(GuideContent.release43Pages.allSatisfy { $0.subtitle.contains("设置 →") && $0.points.joined().contains("默认关闭") })
+        #expect(GuideContent.release43Pages.last?.points.joined().contains("随网易云启动") == true)
+        #expect(GuideContent.release43Pages.first?.points.joined().contains("1–15 秒") == true)
         #expect(GuideContent.tutorial.contains { $0.id == "touchbar" && $0.illustration == "touchBar43" })
         for previous in ["2.0.42", "2.0.40"] {
             try fixture { defaults in
@@ -207,7 +209,7 @@ private struct GuideMotionTestHost: View {
                 let presented = defaults.stringArray(forKey: "guidePresentedEditions") ?? []
                 history.didPresent()
                 #expect(defaults.stringArray(forKey: "guidePresentedEditions") == presented)
-                #expect(presented.contains("2.0.43:touch-bar-43"))
+                #expect(presented.contains("2.0.43:touch-bar-public-preview-1"))
             }
         }
         try fixture { defaults in
@@ -221,8 +223,8 @@ private struct GuideMotionTestHost: View {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let plist = try #require(PropertyListSerialization.propertyList(from: Data(contentsOf: root.appendingPathComponent("Resources/Info.plist")), format: nil) as? [String: Any])
         #expect(plist["CFBundleShortVersionString"] as? String == GuideContent.version)
-        #expect(plist["CFBundleVersion"] as? String == "279")
-        #expect(plist["LyricsXReleaseVersion"] == nil)
+        #expect(plist["CFBundleVersion"] as? String == "279.8")
+        #expect(plist["LyricsXReleaseVersion"] as? String == "2.0.43-TB.5-preview.1")
         #expect(plist["LSMinimumSystemVersion"] as? String == "26.0")
     }
 

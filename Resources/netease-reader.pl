@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+use DynaLoader;
+$|=1;
+my $file=shift @ARGV or die 'Expected local reader library';
+$ENV{'LYRICSX_NETEASE_ARTWORK'}='1' if @ARGV && $ARGV[0] eq 'artwork';
+my $library=DynaLoader::dl_load_file($file) or die DynaLoader::dl_error();
+my $symbol=DynaLoader::dl_find_symbol($library,'lyricsx_netease_snapshot') or die 'Reader entry missing';
+DynaLoader::dl_install_xsub('main::read_snapshot',$symbol);
+read_snapshot();

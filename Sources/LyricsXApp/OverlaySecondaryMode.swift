@@ -13,7 +13,7 @@ enum OverlaySecondaryMode: String, CaseIterable, Identifiable {
         case .next: "仅下一句"
         case .either: "翻译或下一句"
         case .both: "翻译和下一句"
-        case .none: "关闭"
+        case .none: "都不显示"
         }
     }
     struct Content: Equatable {

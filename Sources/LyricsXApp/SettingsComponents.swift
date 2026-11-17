@@ -1,5 +1,15 @@
 import SwiftUI
 
+private struct SettingsSearchHighlightKey: EnvironmentKey {
+    static let defaultValue: String? = nil
+}
+extension EnvironmentValues {
+    var settingsSearchHighlight: String? {
+        get { self[SettingsSearchHighlightKey.self] }
+        set { self[SettingsSearchHighlightKey.self] = newValue }
+    }
+}
+
 struct SettingsIllustratedChoice<Preview: View>: View {
     let title: String
     let detail: String
@@ -39,11 +49,12 @@ struct SettingsCard<Content: View>: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(nsColor: .controlBackgroundColor), in: .rect(cornerRadius: 12))
                 .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.35), lineWidth: 0.5).allowsHitTesting(false) }
-        }
+        }.id(title)
     }
 }
 
 struct SettingRow<Control: View>: View {
+    @Environment(\.settingsSearchHighlight) private var searchHighlight
     let title: String
     let detail: String
     var impact: String? = nil
@@ -61,6 +72,8 @@ struct SettingRow<Control: View>: View {
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }.padding(14)
+            .background(searchHighlight == title ? Color.accentColor.opacity(0.09) : .clear, in: .rect(cornerRadius: 8))
+            .id(title)
     }
 }
 

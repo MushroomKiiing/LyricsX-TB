@@ -19,3 +19,12 @@ Integrations/Flexbar/qa-output/
 com.wzk112.lyricsxnext.plugin/backend/node_modules/
 com.wzk112.lyricsxnext.plugin/logs/
 com.wzk112.lyricsxnext.flexplugin
+
+# Local-only QA and private configuration
+outputs/
+backup/
+*.log
+*.zip
+*.dmg
+.env
+.env.*

@@ -18,11 +18,19 @@ struct ArtworkHandover {
 actor ArtworkDecoder {
     static let shared = ArtworkDecoder()
     private var cached: (data: Data, image: CGImage)?
+    private let session: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        return URLSession(configuration: configuration)
+    }()
 
     func load(data: Data?, url originalURL: URL?) async -> CGImage? {
-        if let data, let image = decode(data) { return image }
+        let fallback = data.flatMap { decode($0) }
+        if let fallback, min(fallback.width, fallback.height) >= 640 || originalURL == nil { return fallback }
         guard !Task.isCancelled, let originalURL,
-              let scheme = originalURL.scheme?.lowercased(), scheme == "https" || scheme == "http" else { return nil }
+              let scheme = originalURL.scheme?.lowercased(), scheme == "https" || scheme == "http" else { return fallback }
         var url = originalURL
         if scheme == "http", var components = URLComponents(url: originalURL, resolvingAgainstBaseURL: false) {
             components.scheme = "https"
@@ -31,10 +39,12 @@ actor ArtworkDecoder {
         do {
             // A source advertised by a player can still stall indefinitely.
             // Bound loading so the quiet pending surface eventually resolves.
-            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url, timeoutInterval: 8))
-            guard !Task.isCancelled, (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
-            return decode(data)
-        } catch { return nil }
+            let (data, response) = try await session.data(for: URLRequest(url: url, timeoutInterval: 8))
+            guard !Task.isCancelled, (response as? HTTPURLResponse)?.statusCode == 200 else { return fallback }
+            guard let decoded = decode(data) else { return fallback }
+            if let fallback, decoded.width < fallback.width || decoded.height < fallback.height { return fallback }
+            return decoded
+        } catch { return fallback }
     }
 
     func decode(_ data: Data) -> CGImage? {
@@ -43,7 +53,7 @@ actor ArtworkDecoder {
         guard let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary),
               let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
                 kCGImageSourceCreateThumbnailFromImageAlways: true,
-                kCGImageSourceThumbnailMaxPixelSize: 640,
+                kCGImageSourceThumbnailMaxPixelSize: 1024,
                 kCGImageSourceCreateThumbnailWithTransform: true,
                 kCGImageSourceShouldCacheImmediately: true
               ] as CFDictionary), !Task.isCancelled else { return nil }

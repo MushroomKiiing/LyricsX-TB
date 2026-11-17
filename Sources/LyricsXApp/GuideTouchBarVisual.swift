@@ -34,10 +34,8 @@ struct GuideTouchBarVisual: View {
 }
 
 struct GuideTouchBarNativeView: NSViewRepresentable {
-    func makeNSView(context: Context) -> TouchBarContentView { TouchBarContentView() }
-    func updateNSView(_ view: TouchBarContentView, context: Context) {
-        view.update(line: GuideTouchBarExample.line, text: GuideTouchBarExample.line.text,
-                    position: GuideTouchBarExample.position, offset: 0, playing: false,
-                    artwork: nil, hasTrack: true)
+    func makeNSView(context: Context) -> LyricView { LyricView(frame: .zero) }
+    func updateNSView(_ view: LyricView, context: Context) {
+        view.update(GuideTouchBarExample.line.text, playing: false)
     }
 }

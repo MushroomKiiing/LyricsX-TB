@@ -29,6 +29,6 @@ struct GlobalLyricOffsetSettings: View {
             }
             Text("只保存到本机设置，不改写歌词文件或播放器进度。重置后仍保留各歌曲的偏移。")
                 .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-        }.padding(16)
+        }.padding(16).id("通用歌词偏移")
     }
 }

@@ -36,7 +36,7 @@ struct OverlayAppearancePicker: View {
             }
             Text("点击图例切换。预览使用相同背景；实际效果会随悬浮窗后方内容变化。")
                 .font(.caption).foregroundStyle(.secondary)
-        }.padding(14)
+        }.padding(14).id("悬浮窗样式")
             .onReceive(DistributedNotificationCenter.default().publisher(for: .init("AppleInterfaceThemeChangedNotification"))) { _ in
                 systemScheme = InterfaceTheme.system.resolvedScheme
             }

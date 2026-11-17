@@ -47,7 +47,7 @@ struct GuidePage: Identifiable {
 
 enum GuideContent {
     // Changed only when the introduction itself is revised, never for a routine rebuild.
-    static let revision = "touch-bar-43"
+    static let revision = "touch-bar-public-preview-1"
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.43"
     static let displayVersion = Bundle.main.object(forInfoDictionaryKey: "LyricsXReleaseVersion") as? String ?? version
     static let tutorial: [GuidePage] = [
@@ -71,15 +71,15 @@ enum GuideContent {
             "实时波形默认关闭。开启后可选择白色或封面彩色，波形沿悬浮窗底部显示。",
             "首次开启可能需要 macOS 系统音频录制权限。仅尝试读取当前识别播放器的音频；暂停、隐藏和减少动态效果时停止。",
             "这里显示固定的示意帧，打开指南不会读取音频。权限或音频不可用时，可在设置中查看状态并重试。"], illustration: "releaseWaveform38"),
-        .init(id: "style", title: "选择喜欢的背景", subtitle: "两种材质，实时预览", symbol: "square.on.square", points: [
+        .init(id: "style", title: "选择喜欢的背景", subtitle: "设置 → 外观，两种材质实时预览", symbol: "square.on.square", points: [
             "Liquid Glass 使用高透玻璃、原生亮边与边缘折射，保持统一外观；磨砂阅读可单独选择深色、浅色或跟随系统。",
             "Liquid Glass 的透明度调节用于减淡底色，保留完整折射；磨砂阅读还可调节磨砂强度。",
             "实际效果会随桌面背景变化。系统开启“降低透明度”时，会使用实色背景。"], illustration: "style"),
-        .init(id: "fonts", title: "换上喜欢的字体", subtitle: "设置 → 歌词 → 字体与颜色", symbol: "textformat", points: [
+        .init(id: "fonts", title: "换上喜欢的字体", subtitle: "设置 → 字体与颜色", symbol: "textformat", points: [
             "选择此 Mac 已安装的字体，主窗口和悬浮窗会一起更换，下方可实时预览排版。",
             "主窗口、悬浮窗、翻译和下一句的字号可分别调整。缺少字符或字体被卸载时，会使用系统字体。",
             "点击“恢复字体与颜色”可回到默认外观。"], illustration: "font"),
-        .init(id: "colors", title: "原文与辅助文字分别选色", subtitle: "设置 → 歌词 → 字体与颜色", symbol: "paintpalette", points: [
+        .init(id: "colors", title: "原文与辅助文字分别选色", subtitle: "设置 → 字体与颜色", symbol: "paintpalette", points: [
             "“当前歌词颜色”控制原文；“翻译与下一句颜色”控制辅助文字，两组颜色可分别设置。",
             "修改后立即生效并保存。Liquid Glass 使用自定义颜色或封面配色时不额外改色，恢复默认配色后自动优化可读性。",
             "若手动颜色选项变灰，请先关闭“跟随封面主题色”。"], illustration: "colors"),
@@ -92,7 +92,7 @@ enum GuideContent {
             "没有封面时使用中性配色。自动配色优先于手动颜色，但不会覆盖它们，关闭即可恢复。",
             "主窗口背景也会随封面变化。背景与歌词的配色分别处理，关闭歌词跟色不会关掉封面背景。"], illustration: "theme"),
         .init(id: "text", title: "翻译、下一句与简繁体", subtitle: "设置 → 歌词", symbol: "text.alignleft", points: [
-            "开启“显示翻译”后，有译文的歌词会显示翻译。辅助内容还可选下一句或两者都显示。悬浮窗原文、翻译行距和段间距可在“设置 → 歌词 → 悬浮窗文字间距”独立调整。",
+            "开启翻译总开关后，在“设置 → 悬浮窗 → 翻译与下一句”选择显示内容。悬浮窗原文、翻译行距和段间距在同页的“悬浮窗文字间距”调整。",
             "“翻译或下一句”会在没有翻译时显示下一句；“仅翻译”则留空。下一句换到当前句时会平滑上移。",
             "可选择原文、简体或繁体显示，简繁转换后仍保留逐字进度。"], illustration: "conversion"),
         .init(id: "effects", title: "让歌词随演唱亮起来", subtitle: "设置 → 动效", symbol: "sparkles", points: [
@@ -101,7 +101,7 @@ enum GuideContent {
             "喜欢安静的画面，可开启应用的“减少动态效果”；系统的同名设置也会生效，位移与辉光会停稳。在开发者选项中可选跟随屏幕（120 Hz 屏幕可请求 120 帧）、固定 60 帧或智能节能；实际帧率由系统决定。"], illustration: "effects"),
         .init(id: "timing", title: "让歌词与音乐对齐", subtitle: "每首歌都会记住调整", symbol: "slider.horizontal.3", points: [
             "歌词慢了，用正偏移提前；歌词快了，用负偏移延后。底部每次调整 0.1 秒，点击数值即可重置。",
-            "所有歌曲都有同样偏差时，在“设置 → 歌词 → 同步”调整通用偏移，再按歌曲微调。两者相加，分别重置；⌥⌘↑／↓ 仍每次调整单曲 0.2 秒。",
+            "所有歌曲都有同样偏差时，在“设置 → 歌词同步”调整通用偏移，再按歌曲微调。两者相加，分别重置；⌥⌘↑／↓ 仍每次调整单曲 0.2 秒。",
             "歌词版本不对时可重新搜索。菜单栏 → 歌词还可以停用某首歌或整张专辑的搜索，需要时再恢复。"], illustration: "timing"),
         .init(id: "library", title: "使用自己的歌词文件", subtitle: "点击书本图标打开资料库", symbol: "books.vertical", points: [
             "下载过的歌词会保存在本地，下次播放优先使用。资料库可以查看已有歌词。",
@@ -111,14 +111,14 @@ enum GuideContent {
             "需要另行安装并配置 FlexDesigner 歌词插件，然后在开发者选项中开启 Flexbar 连接。普通歌词和悬浮窗不需要此功能。",
             "插件可显示逐字歌词与翻译；这里展示插件渲染器生成的图片，不代表设备上的实际显示帧率或亮度。",
             "暂停、隐藏或没有歌词时会减少更新。设备与插件的实际表现可能不同。"], illustration: "releaseFlexbar38"),
-        .init(id: "touchbar", title: "MacBook Pro 的 Touch Bar 歌词", subtitle: "设置 → 开发者选项 → MacBook Pro Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
-            "配备内置 Touch Bar 的 MacBook Pro 可显示歌词、封面和播放控制，无需插件。默认关闭，下方可直接开启。",
-            "逐字高亮需要歌词本身带时间标记。长句会随播放滚动；暂停、跳转和单曲／通用偏移沿用当前歌词设置。",
-            "可单独开启实验性后台入口，切到其他应用后点按控制条中的歌词图标展开。“打开预览”可查看当前歌曲的正式控件，不能代替实体 Touch Bar 验证。"], illustration: "touchBar43"),
+        .init(id: "touchbar", title: "MacBook Pro 的 Touch Bar 歌词", subtitle: "设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
+            "配备内置 Touch Bar 的 MacBook Pro 可显示白色常规字体歌词，无需插件或独立助手。默认关闭，下方可直接开启。",
+            "长句只在超出显示范围时滚动。暂停、跳转和单曲／通用偏移直接跟随主软件。翻译在左右两栏显示。",
+            "开启后台显示后切到其他应用仍可看歌词。可选闲置 1–15 秒后自动全宽，点按歌词或空白恢复歌词与系统控制条；也可打开屏幕预览。"], illustration: "touchBar43"),
         .init(id: "privacy", title: "帮助与更新", subtitle: "设置 → 关于，可随时重看", symbol: "info.circle", points: [
             "搜索时会向启用的歌词来源发送歌名、歌手和时长。不需要的来源可在设置中关闭。",
             "实时波形需在“设置 → 悬浮窗”主动开启，首次使用可能请求系统音频录制权限；打开本指南不会采集音频。开发者选项包含文件管理、来源令牌、帧率与可选 Flexbar 连接。来源令牌保存在系统钥匙串中。",
-            "菜单栏可以检查更新。教程和更新介绍只自动显示一次，以后可在“设置 → 关于”重新查看。"], illustration: "privacy")
+            "菜单栏可查看上游项目更新，本地定制版不通过该入口更新。教程和更新介绍只自动显示一次，以后可在“设置 → 关于”重新查看。"], illustration: "privacy")
     ]
     // Add new release entries here; a version jump includes every intervening
     // entry, while a first upgrade from versions without receipts gets a recap.
@@ -170,7 +170,7 @@ enum GuideContent {
         ("2.0.34", .init(id: "font34", title: "自定义字体与实时预览", subtitle: "新增 · 设置 → 歌词", symbol: "textformat", points: [
             "选择本机字体，主窗口与悬浮窗一起更换；原文、翻译和下一句的字号可分别调整。",
             "设置里可实时查看排版，也能一键恢复默认字体与颜色。缺少字符时自动使用系统字体。"], illustration: "font")),
-        ("2.0.34", .init(id: "color34", title: "原文与辅助文字分别选色", subtitle: "新增 · 设置 → 歌词 → 字体与颜色", symbol: "paintpalette", points: [
+        ("2.0.34", .init(id: "color34", title: "原文与辅助文字分别选色", subtitle: "新增 · 设置 → 字体与颜色", symbol: "paintpalette", points: [
             "自定义原文颜色，以及翻译与下一句的颜色，两个窗口同步生效并自动保存。",
             "保留逐字明暗高亮和长音辉光。预览中可以直接检查配色是否清楚。"], illustration: "colors")),
         ("2.0.34", .init(id: "word34", title: "逐字歌词，两种颜色", subtitle: "新增 · 设置 → 歌词 → 逐字独立配色", symbol: "character.cursor.ibeam", points: [
@@ -201,17 +201,21 @@ enum GuideContent {
             "改善部分 QQ 音乐歌词的读取、搜索与封面显示；修复缓存文件变化及异常设置值引起的显示问题。"], illustration: "conversion"))
     ]
     static let release43Pages: [GuidePage] = [
-        .init(id: "touchBar43", title: "歌词来到 MacBook Pro Touch Bar", subtitle: "新增 · 设置 → 开发者选项 → MacBook Pro Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
-            "在内置 Touch Bar 上查看当前歌词、封面，并播放、暂停或切歌。默认关闭，不需要 FlexDesigner 插件；下方可直接开启。",
-            "带逐字时间的歌词会按演唱进度高亮，长句随播放滚动。暂停、跳转、繁简转换与单曲／通用合计偏移保持同步；无同步歌词时显示歌曲信息。",
-            "本次应用包同时包含 Intel 和 Apple Silicon 版本，最低系统仍为 macOS 26。已完成双架构构建和软件验证，实体 Touch Bar 的显示与触控仍需对应机器确认。"], illustration: "touchBar43"),
-        .init(id: "backgroundTouchBar43", title: "后台入口与屏幕预览", subtitle: "可选 · 设置 → 开发者选项 → MacBook Pro Touch Bar", symbol: "rectangle.on.rectangle", points: [
-            "“后台入口（实验性）”单独开启，默认关闭。切到其他应用后，点按 Touch Bar 控制条中的歌词图标展开；回到应用、关闭功能或睡眠时会撤销自己的后台入口。",
-            "后台入口依赖系统兼容性；不可用时仍可使用前台歌词。实际跨应用显示与唤醒恢复，需要在带 Touch Bar 的机器上测试。",
-            "下方“打开预览”使用当前歌曲和正式歌词控件，无 Touch Bar 也能查看。这里的固定示意帧不会控制播放器，屏幕预览不代表物理面板效果。"], illustration: "touchBar43")
+        .init(id: "touchBar43", title: "Touch Bar 已统一到主软件设置", subtitle: "预览版 · 设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
+            "Touch Bar 歌词、后台显示、固定全宽、闲置后自动全宽与翻译都由这里实时控制。全新安装默认关闭；已有本地助手设置会一次性导入。",
+            "全宽歌词使用整条可用区域。点按歌词或两侧空白，切回左侧歌词与右侧系统控制条；可设置 1–15 秒后恢复全宽。",
+            "歌词保留 15 pt 白色常规字体。翻译原文在左、译文在右；受“歌词”页翻译总开关控制，无译文时原文居中。"], illustration: "touchBar43"),
+        .init(id: "backgroundTouchBar43", title: "设置分组与样式入口", subtitle: "TB.5-preview.1 · 设置 → 外观 / 字体与颜色", symbol: "rectangle.on.rectangle", points: [
+            "后台显示无需独立助手。全新安装默认关闭；歌词时钟、暂停、跳转与单曲／通用偏移直接跟随主软件。",
+            "悬浮窗的“辅助内容”改为“翻译与下一句”，移到页面上方。选择“仅下一句”或“都不显示”即可隐藏悬浮窗译文。主窗口跟随翻译总开关，Touch Bar 另有开关。",
+            "左侧按常用设置、播放与显示、外观、其他分组。播放器、悬浮窗和 Touch Bar 放在一起；界面主题、悬浮窗材质与透明度集中到新的“外观”页。",
+            "字体与颜色页集中说明主窗口与悬浮窗的共用样式，以及 Touch Bar 的固定白色常规字体；Touch Bar 页不再重复该说明。",
+            "应用文件、Dock 和界面统一使用 LyricsX TB；原项目署名与开源许可保留在“关于”。",
+            "“通用 → 随网易云启动”默认关闭，启用后使用轻量后台监听器，打开网易云时自动运行歌词软件；不联网、不保存记录，可随时关闭。全宽等待时间现在可选 1–15 秒。",
+            "字体与颜色只影响主窗口和悬浮窗；Touch Bar 保持白色常规字体。部分播放器只提供 100 像素缩略图。“播放器 → 补充高清封面”可按当前歌曲、歌手、专辑及时长向网易云匹配高清图；默认关闭，匹配不到时保留原封面。"], illustration: "touchBar43")
     ]
     static let release42Pages: [GuidePage] = [
-        .init(id: "globalOffset42", title: "通用歌词偏移", subtitle: "新增 · 设置 → 歌词 → 同步", symbol: "slider.horizontal.3", points: [
+        .init(id: "globalOffset42", title: "通用歌词偏移", subtitle: "新增 · 设置 → 歌词同步", symbol: "slider.horizontal.3", points: [
             "为所有歌曲设置统一的歌词偏移，再用主窗口、悬浮窗“歌词同步”或菜单栏微调单曲；两者相加后生效。正值提前，负值延后。",
             "通用偏移只保存到本机设置，切歌、换歌词版本和重启后保留，不改写歌词文件或播放器进度。重置通用值仍保留单曲偏移，重置单曲也不清除通用值。",
             "主窗口、悬浮窗、菜单栏、搜索预览和 Flexbar 使用相同换算；普通逐行与逐字歌词均适用，纯文本歌词不会生成同步时间。下方可直接调整实际设置。"], illustration: ""),
@@ -364,7 +368,7 @@ enum GuideContent {
             window.center()
             self.window = window
         }
-        window?.title = mode == .tutorial ? "LyricsX Next · 使用指南" : "LyricsX Next · 版本介绍"
+        window?.title = mode == .tutorial ? "LyricsX TB · 使用指南" : "LyricsX TB · 版本介绍"
         window?.contentView = NSHostingView(rootView: FeatureGuideView(mode: mode, preferences: preferences, model: model, close: { [weak self] in self?.close() }))
         // Activate first, then force this dedicated window to the front. This
         // is independent from Settings and the motion/search preview scenes.
@@ -417,7 +421,7 @@ struct FeatureGuideView: View {
         GeometryReader { guideSize in
           HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 12) {
-                Label("LyricsX Next", systemImage: "quote.bubble.fill").font(.headline)
+                Label("LyricsX TB", systemImage: "quote.bubble.fill").font(.headline)
                 Text(mode == .tutorial ? "使用指南" : "\(GuideContent.displayVersion) · 本次更新")
                     .font(.title3.weight(.semibold))
                 ScrollViewReader { navigation in
@@ -555,8 +559,10 @@ private struct GuideQuickSettings: View {
         case "flexbar", "performanceFlexbar38":
             SettingToggle(title: "在 Flexbar 上显示歌词", detail: "需要另行安装和配置 FlexDesigner 歌词插件。入口在设置 → 开发者选项 → Flexbar。", value: $preferences.flexbarEnabled)
         case "touchbar", "touchBar43", "backgroundTouchBar43":
-            SettingToggle(title: "在 Touch Bar 上显示歌词", detail: "在应用前台显示歌词、封面与播放控制，默认关闭。", value: $preferences.touchBarEnabled)
-            SettingToggle(title: "后台入口（实验性）", detail: "切到其他应用后，点按控制条的歌词图标展开。", value: $preferences.touchBarBackgroundEnabled)
+            SettingToggle(title: "在 Touch Bar 上显示歌词", detail: "显示白色常规字体歌词，支持全宽、后台与左右翻译。", value: $preferences.touchBarEnabled)
+            SettingToggle(title: "后台显示", detail: "切到其他应用后保持歌词，可从气泡图标展开。", value: $preferences.touchBarBackgroundEnabled)
+                .disabled(!preferences.touchBarEnabled)
+            SettingToggle(title: "闲置后自动全宽", detail: "点按歌词或空白，切回歌词与右侧系统控制条。", value: $preferences.touchBarAutoFullWidth)
                 .disabled(!preferences.touchBarEnabled)
             SettingRow(title: "预览当前歌曲", detail: "使用实际歌词控件；屏幕预览不能验证实体触控条。") {
                 Button("打开预览") { model?.touchBar.showPreview() }.disabled(model == nil)

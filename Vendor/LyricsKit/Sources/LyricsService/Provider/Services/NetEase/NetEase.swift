@@ -2,6 +2,28 @@ import Foundation
 import LyricsCore
 import Regex
 
+/// Album metadata only: does not download lyrics or require an account.
+public struct NetEaseAlbumArtwork: Sendable {
+    public let title: String
+    public let artists: [String]
+    public let album: String
+    public let albumID: Int
+    public let duration: Double
+    public let url: URL?
+}
+
+public enum NetEaseArtworkSearch {
+    public static func search(title: String, artist: String, duration: Double,
+                              httpClient: HTTPClient = .shared) async throws -> [NetEaseAlbumArtwork] {
+        let provider = LyricsProviders.NetEase(httpClient: httpClient)
+        let request = LyricsSearchRequest(searchTerm: .info(title: title, artist: artist), duration: duration, limit: 12)
+        return try await provider.search(for: request).map {
+            .init(title: $0.value.name, artists: $0.value.artists.map(\.name), album: $0.value.album.name, albumID: $0.value.album.id,
+                  duration: Double($0.value.duration) / 1000, url: $0.value.album.picUrl)
+        }
+    }
+}
+
 extension LyricsProviders {
     final class NetEase {
         let httpClient: HTTPClient

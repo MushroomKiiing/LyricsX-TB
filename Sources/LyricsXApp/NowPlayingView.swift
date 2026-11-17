@@ -181,10 +181,10 @@ private struct LyricsScrollContent: View {
     }
     private var trackTitlePlaceholder: some View {
         VStack(spacing: 18) {
-            Text(display.track?.title ?? "LyricsX Next")
+            Text(display.track?.title ?? "LyricsX TB")
                 .font(.system(size: 34, weight: .semibold))
                 .foregroundStyle(Color.primary.opacity(0.9)).lineLimit(2).multilineTextAlignment(.center)
-                .accessibilityLabel("当前歌曲：\(display.track?.title ?? "LyricsX Next")")
+                .accessibilityLabel("当前歌曲：\(display.track?.title ?? "LyricsX TB")")
             if !live {
                 EmptyView()
             } else if model.lyricsBlocked {

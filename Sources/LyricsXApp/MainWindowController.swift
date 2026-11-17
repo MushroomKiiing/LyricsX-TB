@@ -30,7 +30,7 @@ import SwiftUI
             window = makeWindow()
             self.window = window
             window.identifier = .init("main")
-            window.title = "LyricsX Next"
+            window.title = "LyricsX TB"
             window.titleVisibility = .hidden
             window.titlebarAppearsTransparent = true
             window.isMovableByWindowBackground = false

@@ -13,7 +13,7 @@ final class AppModel {
     let bridge = PlayerBridge()
     let dockVisibility: DockVisibilityController
     let flexbar: FlexbarController
-    let touchBar = TouchBarController()
+    let touchBar = IntegratedTouchBarController()
     var playerError: String?
     var message: String?
     var showSearch = false
@@ -79,6 +79,7 @@ final class AppModel {
         }
         observeGlobalOffset()
         observeMainLyricPresentation()
+        observeArtworkQuality()
     }
     private static let gapCharacters = CharacterSet(charactersIn: ".·•…⋯・。 \t\n")
     var overlayPresentationMode: OverlayPresentationMode {
@@ -90,14 +91,14 @@ final class AppModel {
     }
     var overlayUsesCompactPresentation: Bool { overlayPresentationMode != .lyrics }
     var menubarText: String {
-        let fallback = session.track?.title ?? "LyricsX Next"
+        let fallback = session.track?.title ?? "LyricsX TB"
         var text = fallback
         if overlayPresentationMode == .lyrics, let doc = session.document,
            let index = session.currentLineIndex, doc.lines.indices.contains(index) {
             text = preferences.text(doc.lines[index].text)
         }
         let singleLine = text.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
-        return singleLine.isEmpty ? "LyricsX Next" : String(singleLine.prefix(36)) + (singleLine.count > 36 ? "…" : "")
+        return singleLine.isEmpty ? "LyricsX TB" : String(singleLine.prefix(36)) + (singleLine.count > 36 ? "…" : "")
     }
     func updateMainLyricSelection() {
         guard mainWindowVisible else { return }
@@ -111,7 +112,7 @@ final class AppModel {
         guard ticker == nil else { return }
         let wasStopped = presentationStopped
         presentationStopped = false
-        if wasStopped { observeGlobalOffset(); observeMainLyricPresentation() }
+        if wasStopped { observeGlobalOffset(); observeMainLyricPresentation(); observeArtworkQuality() }
         displays.start()
         dockVisibility.start()
         observeDockVisibility()
@@ -191,6 +192,16 @@ final class AppModel {
             Task { @MainActor in self?.observeMainLyricPresentation() }
         }
         mainLyricPresentation.update(model: self)
+    }
+    private func observeArtworkQuality() {
+        guard !presentationStopped else { return }
+        withObservationTracking { _ = preferences.highResolutionArtwork } onChange: { [weak self] in
+            Task { @MainActor in
+                guard let self, !self.presentationStopped else { return }
+                self.updateArtwork(self.session.track)
+                self.observeArtworkQuality()
+            }
+        }
     }
     private func observeGlobalOffset() {
         guard !presentationStopped else { return }
@@ -348,8 +359,8 @@ final class AppModel {
                 struct Release: Decodable { let tag_name: String; let html_url: URL }
                 let release = try JSONDecoder().decode(Release.self, from: data)
                 let alert = NSAlert()
-                alert.messageText = "LyricsX Next 最新版本：\(release.tag_name)"
-                alert.informativeText = "当前版本：\(GuideContent.displayVersion)。打开项目发布页查看更新说明与下载。"
+                alert.messageText = "上游 LyricsX Next 最新版本：\(release.tag_name)"
+                alert.informativeText = "当前本地版本：\(GuideContent.displayVersion)。这里查询的是上游更新，不包含本地 Touch Bar 定制功能。"
                 alert.addButton(withTitle: "打开发布页"); alert.addButton(withTitle: "关闭")
                 NSApp.activate()
                 if alert.runModal() == .alertFirstButtonReturn, release.html_url.host == "github.com" { NSWorkspace.shared.open(release.html_url) }
@@ -421,7 +432,7 @@ final class AppModel {
     }
     private func updateArtwork(_ track: Track?) {
         guard !presentationStopped else { return }
-        let identity = "\(session.trackRevision):" + (track?.artworkURL?.absoluteString ?? "")
+        let identity = "\(session.trackRevision):hq=\(preferences.highResolutionArtwork):" + (track?.artworkURL?.absoluteString ?? "")
         guard identity != artworkIdentity || track?.artworkData != artworkBytes else { return }
         artworkIdentity = identity; artworkBytes = track?.artworkData; artworkTask?.cancel()
         artworkThemeTask?.cancel(); artworkHandoverTask?.cancel()
@@ -467,6 +478,22 @@ final class AppModel {
                 self.publishingArtwork = false
                 self.artworkHandover.finish()
             } else { self.artwork = nil }
+            // Publish the system thumbnail immediately, then refine without
+            // delaying playback or lyric synchronization. Identity guards apply
+            // again after both network and decoding awaits.
+            if let track, track.playerID == "com.netease.163music", self.preferences.highResolutionArtwork,
+               let decoded, min(decoded.width, decoded.height) < 640,
+               let highURL = await NetEaseArtworkResolver.shared.url(for: track),
+               !Task.isCancelled,
+               let high = await loader(data, highURL), min(high.width, high.height) > min(decoded.width, decoded.height) {
+                let highTheme = await ArtworkThemeExtractor.shared.theme(for: high)
+                guard !Task.isCancelled, !self.presentationStopped,
+                      self.artworkIdentity == identity, self.artworkGeneration == generation else { return }
+                self.publishingArtwork = true
+                self.artwork = NSImage(cgImage: high, size: .zero)
+                if self.preferences.artworkTheme != highTheme { self.preferences.artworkTheme = highTheme }
+                self.publishingArtwork = false
+            }
             self.artworkTask = nil
         }
     }

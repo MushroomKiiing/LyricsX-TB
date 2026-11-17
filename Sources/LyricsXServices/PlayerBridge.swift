@@ -4,12 +4,12 @@ import LyricsXCore
 @preconcurrency import MediaRemoteAdapter
 
 public enum PlayerMode: String, CaseIterable, Sendable, Identifiable {
-    case automatic, appleMusic, spotify
+    case automatic, appleMusic, spotify, netease
     public var id: String { rawValue }
     public var title: String {
-        switch self { case .automatic: "自动 · 音乐播放器"; case .appleMusic: "Apple Music"; case .spotify: "Spotify" }
+        switch self { case .automatic: "自动 · 音乐播放器"; case .appleMusic: "Apple Music"; case .spotify: "Spotify"; case .netease: "网易云音乐" }
     }
-    var bundleID: String? { switch self { case .automatic: nil; case .appleMusic: "com.apple.Music"; case .spotify: "com.spotify.client" } }
+    var bundleID: String? { switch self { case .automatic: nil; case .appleMusic: "com.apple.Music"; case .spotify: "com.spotify.client"; case .netease: "com.netease.163music" } }
 }
 public enum PlayerCommand: Sendable, Equatable { case toggle, next, previous, seek(Double) }
 
@@ -108,13 +108,20 @@ public final class PlayerBridge {
     private var scriptTarget: String?
     private var refreshPending = false
     private var continuity = PlaybackContinuity()
+    private var neteaseArtworkID = ""
+    private var neteaseArtworkData: Data?
+    private var neteaseArtworkPending = true
     private var artworkAttempts = 0
     private var nextArtworkAttempt: Double = 0
     private var snapshotReader: (@MainActor () async throws -> PlaybackSnapshot)?
     private var artworkReader: (@MainActor (Track) async -> Data?)?
     private var commandExecutor: (@MainActor (PlayerCommand) async throws -> Void)?
     private var now: @MainActor () -> Double = { ProcessInfo.processInfo.systemUptime }
+    private var neteaseReader: (@MainActor () async -> PlaybackSnapshot?)?
     public init() {}
+    init(neteaseReader: @escaping @MainActor () async -> PlaybackSnapshot?) {
+        self.neteaseReader = neteaseReader
+    }
     init(snapshotReader: @escaping @MainActor () async throws -> PlaybackSnapshot,
          artworkReader: (@MainActor (Track) async -> Data?)? = nil,
          commandExecutor: (@MainActor (PlayerCommand) async throws -> Void)? = nil,
@@ -282,7 +289,7 @@ public final class PlayerBridge {
     }
     private func execute(_ command: PlayerCommand) async throws {
         if let commandExecutor { try await commandExecutor(command); return }
-        if let target = mode.bundleID ?? scriptTarget {
+        if let target = mode.bundleID ?? scriptTarget, target != "com.netease.163music" {
             let operation: String
             switch command {
             case .toggle: operation = "app.playpause()"
@@ -299,6 +306,18 @@ public final class PlayerBridge {
             guard let current = try await readSnapshot().track else { throw BridgeError.excludedSource }
             if scriptTarget != nil { try await execute(command); return }
             guard current.playerID == continuity.latest?.track?.playerID else { throw BridgeError.excludedSource }
+            if current.playerID == "com.netease.163music" {
+                // Dedicated reads are independent of global media focus;
+                // generic media commands are not. Never control a browser.
+                let focus = try await runMedia(["update_player_state"])
+                struct FocusEnvelope: Decodable { let payload: SystemMediaPayload? }
+                let owner = String(decoding: focus.data, as: UTF8.self).split(separator: "\n").reversed().compactMap {
+                    try? JSONDecoder().decode(FocusEnvelope.self, from: Data($0.utf8)).payload
+                }.first
+                guard (owner?.parentApplicationBundleIdentifier ?? owner?.bundleIdentifier) == "com.netease.163music" else {
+                    throw BridgeError.excludedSource
+                }
+            }
             let args: [String]
             switch command {
             case .toggle: args = ["toggle_play_pause"]
@@ -311,6 +330,14 @@ public final class PlayerBridge {
         }
     }
     private func readSnapshot() async throws -> PlaybackSnapshot {
+        if mode == .netease {
+            guard neteaseReader != nil || !NSRunningApplication.runningApplications(withBundleIdentifier: "com.netease.163music").isEmpty else {
+                return PlaybackSnapshot(track: nil, position: 0, isPlaying: false)
+            }
+            scriptTarget = nil
+            guard let snapshot = await readNeteaseClient() else { throw BridgeError.unavailable }
+            return snapshot
+        }
         if let target = mode.bundleID { scriptTarget = target; return try await readScript(target) }
         let previousScriptTarget = scriptTarget
         let musicApps = musicApplications.applications()
@@ -324,6 +351,15 @@ public final class PlayerBridge {
            ["com.apple.Music", "com.spotify.client"].contains(target) {
             scriptTarget = target
             return try await readScript(target)
+        }
+        // NetEase remains an active media client even when Safari takes the
+        // global Now Playing slot. Query its own client rather than treating
+        // a browser-owned global response as proof that music stopped.
+        let netease = musicApps.contains { $0.bundleIdentifier == "com.netease.163music" }
+            ? await readNeteaseClient() : nil
+        if let netease, netease.isPlaying {
+            scriptTarget = nil
+            return netease
         }
         do {
             let result = try await runMedia(["update_player_state"])
@@ -371,6 +407,10 @@ public final class PlayerBridge {
                 scriptTarget = first.id
                 return first.value
             }
+            if let netease {
+                scriptTarget = nil
+                return netease
+            }
             if runningIDs.isEmpty, (error as? BridgeError) == .excludedSource {
                 scriptTarget = nil
                 return PlaybackSnapshot(track: nil, position: 0, isPlaying: false)
@@ -380,6 +420,28 @@ public final class PlayerBridge {
             }
             throw error
         }
+    }
+    private func readNeteaseClient() async -> PlaybackSnapshot? {
+        if let neteaseReader { return await neteaseReader() }
+        guard let script = Bundle.main.url(forResource: "netease-reader", withExtension: "pl") else { return nil }
+        let library = Bundle.main.bundleURL.appendingPathComponent("Contents/Frameworks/libLyricsXNeteaseReader.dylib")
+        let includeArtwork = neteaseArtworkPending
+        let arguments = [script.path, library.path] + (includeArtwork ? ["artwork"] : [])
+        guard FileManager.default.fileExists(atPath: library.path),
+              let result = try? await ProcessRunner.run("/usr/bin/perl", arguments: arguments, timeout: 2),
+              result.status == 0,
+              var payload = try? JSONDecoder().decode(SystemMediaPayload.self, from: result.data),
+              payload.bundleIdentifier == "com.netease.163music" else { return nil }
+        let identity = [payload.title ?? "", payload.artist ?? "", payload.album ?? ""].joined(separator: "\u{1f}")
+        if identity != neteaseArtworkID {
+            neteaseArtworkID = identity
+            neteaseArtworkData = nil
+            neteaseArtworkPending = !includeArtwork
+        } else if includeArtwork { neteaseArtworkPending = false }
+        if let encoded = payload.artworkDataBase64 { neteaseArtworkData = Data(base64Encoded: encoded) }
+        else { payload.artworkDataBase64 = neteaseArtworkData?.base64EncodedString() }
+        let snapshot = payload.snapshot(now: ProcessInfo.processInfo.systemUptime)
+        return snapshot.track == nil ? nil : snapshot
     }
     private func runMedia(_ command: [String]) async throws -> ProcessRunner.Output {
         guard let script = Bundle.main.url(forResource: "run", withExtension: "pl") else { throw BridgeError.bundle }

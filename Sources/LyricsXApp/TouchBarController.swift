@@ -63,6 +63,15 @@ final class TouchBarController: NSObject, NSTouchBarDelegate, NSWindowDelegate {
                     Task { @MainActor in
                         guard let self, self.generation == token else { return }
                         self.synchronizePlayback()
+                        // The Control Strip is rebuilt during app switching. Register and
+                        // expand after that transition, without activating this app.
+                        if !NSApp.isActive {
+                            try? await Task.sleep(for: .milliseconds(300))
+                            guard self.isRunning, self.generation == token, !NSApp.isActive else { return }
+                            self.removeTray()
+                            self.synchronizePlayback()
+                            self.presentFromControlStrip()
+                        }
                     }
                 })
             }

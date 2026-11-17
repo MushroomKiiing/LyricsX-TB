@@ -74,7 +74,7 @@ struct HDRBrightnessControl: View {
             .hdrDisplayScope(requested: visible && value > 1, visible: visible)
             Text("预览停在同一个长音时刻，调节即可对比。1× 以普通白色为基准；屏幕当前可用亮度会随系统状态变化，超过时由系统限制。不会改变屏幕亮度设置。")
                 .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-        }.padding(14)
+        }.padding(14).id("HDR 亮度倍数")
             .onAppear {
                 draft = String(format: "%.1f", value)
                 displays = NSScreen.screens.map(HDRDisplayCapability.init(screen:))

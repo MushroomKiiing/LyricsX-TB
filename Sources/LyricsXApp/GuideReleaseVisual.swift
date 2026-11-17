@@ -67,7 +67,7 @@ struct GuideReleaseVisual: View {
                 demoCover.frame(width: 68, height: 68)
                 VStack(alignment: .leading, spacing: 5) {
                     Text("让光随音乐流动").font(.system(size: 21, weight: .semibold))
-                    Text("LyricsX Next · 演示歌曲").font(.callout).opacity(0.78)
+                    Text("LyricsX TB · 演示歌曲").font(.callout).opacity(0.78)
                 }
                 Spacer(minLength: 0)
             }
@@ -88,7 +88,7 @@ struct GuideReleaseVisual: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("让光随音乐流动").font(.caption.weight(.semibold)).lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
-                    Text("LyricsX Next").font(.caption2).lineLimit(1).minimumScaleFactor(0.8).opacity(0.75)
+                    Text("LyricsX TB").font(.caption2).lineLimit(1).minimumScaleFactor(0.8).opacity(0.75)
                 }
                 Spacer(minLength: 0)
             }
@@ -104,7 +104,7 @@ struct GuideReleaseVisual: View {
 
     private var centeredLyricsPreview: some View {
         VStack(spacing: 0) {
-            Text("LyricsX Next · 演示").font(.system(size: 9)).opacity(0.7)
+            Text("LyricsX TB · 演示").font(.system(size: 9)).opacity(0.7)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Spacer(minLength: 0)
             VStack(spacing: 5) {

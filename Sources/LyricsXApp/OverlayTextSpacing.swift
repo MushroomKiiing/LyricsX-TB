@@ -33,10 +33,10 @@ struct OverlayTextSpacingSettings: View {
                       value: $preferences.overlayTextSpacing.translationLineSpacing, range: 0...18)
         SettingToggle(title: "段间距跟随字号", detail: "保持原来的自动间距。关闭后可单独调整下方两个段间距。",
                       value: $preferences.overlayTextSpacing.automaticGaps)
-        SettingSlider(title: "原文与辅助行间距", detail: "原文与翻译或下一句之间的距离；自动高度下没有辅助内容时不留空。",
+        SettingSlider(title: "原文与辅助行间距", detail: "关闭“段间距跟随字号”后可调。控制原文与翻译或下一句之间的距离；没有辅助内容时不留空。",
                       value: $preferences.overlayTextSpacing.primaryGap, range: 0...40)
             .disabled(preferences.overlayTextSpacing.automaticGaps)
-        SettingSlider(title: "翻译与下一句间距", detail: "仅在同时显示翻译和下一句时生效。",
+        SettingSlider(title: "翻译与下一句间距", detail: "关闭“段间距跟随字号”后可调；仅在同时显示翻译和下一句时生效。",
                       value: $preferences.overlayTextSpacing.secondaryGap, range: 0...32)
             .disabled(preferences.overlayTextSpacing.automaticGaps)
         SettingRow(title: "恢复默认间距", detail: "恢复默认行距和跟随字号的段间距，不改变字体、字号或歌词位置。") {

@@ -128,15 +128,15 @@ import LyricsXCore
         let bitmap = try #require(view.bitmapImageRepForCachingDisplay(in: view.bounds))
         view.cacheDisplay(in: view.bounds, to: bitmap)
         #expect(bitmap.pixelsWide >= 500 && bitmap.pixelsHigh >= 30)
-        var lit = 0, mint = 0
+        var lit = 0, colored = 0
         for y in 0..<bitmap.pixelsHigh {
             for x in 0..<bitmap.pixelsWide {
                 let color = try #require(bitmap.colorAt(x: x, y: y)?.usingColorSpace(.deviceRGB))
                 if color.greenComponent > 0.3 { lit += 1 }
-                if color.greenComponent > color.redComponent + 0.2 { mint += 1 }
+                if max(color.redComponent, color.greenComponent, color.blueComponent) - min(color.redComponent, color.greenComponent, color.blueComponent) > 0.1 { colored += 1 }
             }
         }
-        #expect(lit > 100 && mint > 30)
+        #expect(lit > 100 && colored == 0, "Touch Bar glyphs remain white rather than colored karaoke ink")
         if ProcessInfo.processInfo.environment["LYRICSX_TOUCHBAR_QA"] == "1" {
             let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
             let directory = ProcessInfo.processInfo.environment["LYRICSX_TOUCHBAR_QA_OUTPUT"]

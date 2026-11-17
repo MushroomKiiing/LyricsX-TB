@@ -160,8 +160,13 @@ final class Preferences {
         }
     }
     var mainLyricPlacement: MainLyricPlacement { mainLyricPosition.placement(customPercent: mainLyricCustomPercent) }
+    var highResolutionArtwork: Bool { didSet { save("highResolutionArtwork", highResolutionArtwork) } }
     var showTranslation: Bool { didSet { save("showTranslation", showTranslation) } }
     var flexbarEnabled: Bool { didSet { save("flexbarEnabled", flexbarEnabled) } }
+    var touchBarFullWidth: Bool { didSet { save("touchBarFullWidth", touchBarFullWidth) } }
+    var touchBarAutoFullWidth: Bool { didSet { save("touchBarAutoFullWidth", touchBarAutoFullWidth) } }
+    var touchBarShowTranslation: Bool { didSet { save("touchBarShowTranslation", touchBarShowTranslation) } }
+    var touchBarIdleSeconds: Double { didSet { save("touchBarIdleSeconds", touchBarIdleSeconds) } }
     var touchBarEnabled: Bool { didSet { save("touchBarEnabled", touchBarEnabled) } }
     var touchBarBackgroundEnabled: Bool { didSet { save("touchBarBackgroundEnabled", touchBarBackgroundEnabled) } }
     var showMenubarLyrics: Bool { didSet { save("showMenubarLyrics", showMenubarLyrics) } }
@@ -194,6 +199,17 @@ final class Preferences {
     var overlaySecondarySpacing: Double { overlayTextSpacing.automaticGaps ? max(8, max(translationFontSize, nextLineFontSize) * 0.6) : overlayTextSpacing.secondaryGap }
     init(defaults d: UserDefaults = .standard) {
         defaults = d
+        // Import the already verified local companion settings once. Thereafter
+        // this preferences store is the only source of truth.
+        if d === UserDefaults.standard, Bundle.main.bundleIdentifier == "com.lyricsx.modern",
+           !d.bool(forKey: "touchBarIntegratedV1"),
+           let old = d.persistentDomain(forName: "local.shiloh.touchbarlyrics"), !old.isEmpty {
+            d.set(true, forKey: "touchBarEnabled"); d.set(true, forKey: "touchBarBackgroundEnabled")
+            d.set(old["fullWidth"] as? Bool ?? false, forKey: "touchBarFullWidth")
+            d.set(old["autoFullWidth"] as? Bool ?? false, forKey: "touchBarAutoFullWidth")
+            d.set(old["showsTranslation"] as? Bool ?? false, forKey: "touchBarShowTranslation")
+            d.set(true, forKey: "touchBarIntegratedV1")
+        }
         savedGlobalOffsetMilliseconds = LyricsOffset.normalized(d.object(forKey: "globalOffsetMilliseconds") as? Int ?? 0)
         globalHotkeys = HotkeyPreferences(defaults: d)
         sourceConfigurationReader = SourceConfigurationReader(defaults: d)
@@ -255,8 +271,13 @@ final class Preferences {
         mainLyricPosition = MainLyricPosition(savedValue: d.string(forKey: "mainLyricPosition"))
         savedMainLyricCustomPercent = MainLyricPosition.normalizedPercent(
             number("mainLyricCustomPercent", MainLyricPosition.defaultCustomPercent, MainLyricPosition.customRange))
+        highResolutionArtwork = d.object(forKey: "highResolutionArtwork") as? Bool ?? false
         showTranslation = d.object(forKey: "showTranslation") as? Bool ?? true
         flexbarEnabled = d.bool(forKey: "flexbarEnabled")
+        touchBarFullWidth = d.bool(forKey: "touchBarFullWidth")
+        touchBarAutoFullWidth = d.bool(forKey: "touchBarAutoFullWidth")
+        touchBarShowTranslation = d.object(forKey: "touchBarShowTranslation") as? Bool ?? true
+        touchBarIdleSeconds = number("touchBarIdleSeconds", 3, 1...15)
         touchBarEnabled = d.bool(forKey: "touchBarEnabled")
         touchBarBackgroundEnabled = d.bool(forKey: "touchBarBackgroundEnabled")
         showMenubarLyrics = d.bool(forKey: "showMenubarLyrics")

@@ -21,7 +21,7 @@ import LyricsXCore
     @Test func thumbnailIsBoundedAndInvalidInputsAreRejected() async throws {
         let decoder = ArtworkDecoder()
         let image = try #require(await decoder.decode(png(.red, side: 1800)))
-        #expect(image.width == 640 && image.height == 640)
+        #expect(image.width == 1024 && image.height == 1024)
         #expect(await decoder.decode(Data("not an image".utf8)) == nil)
         #expect(await decoder.load(data: nil, url: URL(string: "file:///not-an-artwork")) == nil)
     }

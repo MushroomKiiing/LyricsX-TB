@@ -54,7 +54,7 @@ private struct LyricsXCommands: Commands {
             Divider()
             Toggle("显示菜单栏图标", isOn: $model.preferences.showMenuBarIcon)
             Toggle("显示菜单栏歌词", isOn: $model.preferences.showMenubarLyrics)
-            Button("打开 LyricsX Next") { model.showMainWindow?(); NSApp.activate() }
+            Button("打开 LyricsX TB") { model.showMainWindow?(); NSApp.activate() }
         }
     }
     private func configureSceneActions() {
@@ -69,10 +69,10 @@ private struct MenuBarContent: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        Text(model.session.track?.title ?? "LyricsX Next").font(.headline)
+        Text(model.session.track?.title ?? "LyricsX TB").font(.headline)
         if let artist = model.session.track?.artist { Text(artist) }
         Divider()
-        Button("打开 LyricsX Next") { model.showMainWindow?(); NSApp.activate() }
+        Button("打开 LyricsX TB") { model.showMainWindow?(); NSApp.activate() }
         Toggle("悬浮歌词", isOn: Binding(get: { model.preferences.overlayVisible }, set: { model.setOverlayVisible($0) }))
         Toggle("锁定位置", isOn: Binding(get: { model.preferences.overlayLocked }, set: { model.setOverlayLocked($0) }))
         Toggle("歌词区域点击穿透", isOn: Binding(get: { model.preferences.overlayClickThrough }, set: { model.setOverlayClickThrough($0) }))
@@ -106,9 +106,9 @@ private struct MenuBarContent: View {
         Button("歌词资料库…") { model.showMainWindow?(); NSApp.activate(); model.showLibrary = true }
         Button("设置…") { openSettings(); NSApp.activate() }
         Divider()
-        Button("关于 LyricsX Next") { NSApp.orderFrontStandardAboutPanel(nil); NSApp.activate() }
-        Button("检查更新…") { model.checkForUpdates() }
-        Button("退出 LyricsX Next") { NSApp.terminate(nil) }.keyboardShortcut("q")
+        Button("关于 LyricsX TB") { NSApp.orderFrontStandardAboutPanel(nil); NSApp.activate() }
+        Button("查看上游更新…") { model.checkForUpdates() }
+        Button("退出 LyricsX TB") { NSApp.terminate(nil) }.keyboardShortcut("q")
     }
 }
 
@@ -139,8 +139,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.featureGuide.show(tutorial ? .tutorial : .update(previous: GuideContent.latestBaseline))
         }
         model.start()
-        mainWindow.show()
-        featureGuide.scheduleAutomaticPresentation()
+        _ = mainWindow // Install the menu/hotkey reopen action even during a background launch.
+        if !ProcessInfo.processInfo.arguments.contains("--netease-background-launch") {
+            mainWindow.show()
+            featureGuide.scheduleAutomaticPresentation()
+        }
         if hotkeys == nil { hotkeys = GlobalHotkeys(model: model) }
         model.dockVisibility.applicationActivated()
     }

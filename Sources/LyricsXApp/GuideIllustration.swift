@@ -71,7 +71,7 @@ struct GuideIllustration: View {
             VStack(spacing: 10) {
                 HStack {
                     Image(systemName: kind == "theme" ? "photo" : "music.note")
-                    Text(kind == "font" ? "Aa · 字体排版示例" : "LyricsX Next · 演示歌词")
+                    Text(kind == "font" ? "Aa · 字体排版示例" : "LyricsX TB · 演示歌词")
                     Spacer()
                 }.font(.caption).foregroundStyle(.white.opacity(0.75))
                 if kind == "font" {

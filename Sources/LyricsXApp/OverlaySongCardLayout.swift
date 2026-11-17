@@ -15,7 +15,7 @@ import AppKit
 
     init(width: Double, title: String? = nil, artist: String? = nil) {
         self.width = width
-        displayedTitle = title ?? "LyricsX Next"
+        displayedTitle = title ?? "LyricsX TB"
         displayedArtist = artist ?? ""
     }
 

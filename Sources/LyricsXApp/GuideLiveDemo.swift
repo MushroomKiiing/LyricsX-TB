@@ -54,7 +54,7 @@ import LyricsXCore
     func selectTrack(now: Double = ProcessInfo.processInfo.systemUptime) {
         startedAt = now
         let track = Track(playerID: "guide-demo", playerName: "演示", title: alternate
-            ? "更长的歌名，也保持播放控件的位置" : "材质与动效演示", artist: alternate ? "LyricsX Next · 独立演示" : "LyricsX Next",
+            ? "更长的歌名，也保持播放控件的位置" : "材质与动效演示", artist: alternate ? "LyricsX TB · 独立演示" : "LyricsX TB",
             album: alternate ? "不同长度的专辑信息" : "原创示例", duration: 12)
         model.session.accept(.init(track: track, position: 0, isPlaying: !model.preferences.reduceMotion, sampledAt: now), now: now, shouldSearch: false)
         model.session.use(demoDocument, persist: false)

@@ -13,85 +13,91 @@ struct LyricTypographySettings: View {
         .init(id: 1, time: 10, text: "这是下一句的显示预览")])
 
     var body: some View {
-        SettingsCard(title: "字体与颜色 · 实时预览") {
-            SettingRow(title: "歌词字体", detail: "使用此 Mac 已安装的字体。保持设置字号，自动适配行高；原文、翻译和下一句的字号仍可分别设置。", impact: "缺少字符会使用系统后备字体；卸载所选字体后自动回退到系统字体。") {
-                Picker("歌词字体", selection: $preferences.lyricFontName) {
-                    Text("系统字体").tag("")
-                    if !preferences.lyricFontName.isEmpty && !Self.fonts.contains(preferences.lyricFontName) {
-                        Text("\(preferences.lyricFontName)（未安装）").tag(preferences.lyricFontName)
-                    }
-                    ForEach(Self.fonts, id: \.self) { name in
-                        Text(Self.fontTitles[name] ?? name).tag(name)
-                    }
-                }.labelsHidden().frame(width: 220)
+        Group {
+            SettingsCard(title: "适用范围") {
+                SettingRow(title: "主窗口与悬浮窗", detail: "共用下方的字体与颜色设置；两处的字号仍分别在“歌词”和“悬浮窗”页调整。浅色界面会适配颜色对比度。") { EmptyView() }
+                SettingRow(title: "Touch Bar", detail: "保持 15 pt 系统常规字体和白色，不跟随下方设置。窄屏歌词使用固定样式。") { EmptyView() }
             }
-            SettingToggle(title: "跟随封面主题色", detail: "从当前封面提取配色，并按界面深浅调整对比度。已唱、未唱和翻译保持区分。", impact: "无封面时使用中性配色。自动配色优先于手动配色；关闭即可恢复原来的颜色。复杂背景仍建议使用磨砂阅读。", value: $preferences.followArtworkColors)
-            Label("Liquid Glass 使用默认配色时自动优化可读性；自定义颜色、逐字独立配色或跟随封面时不再额外改色。恢复默认配色后自动恢复优化，无需手动切换。", systemImage: "info.circle")
-                .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 16)
-            if preferences.followArtworkColors {
-                HStack(spacing: 12) {
-                    ForEach(Array([preferences.artworkTheme?.accent ?? "BFC7D5", preferences.typography.primaryHex,
-                             preferences.artworkTheme?.unsung ?? "757575"].enumerated()), id: \.offset) { item in
-                        RoundedRectangle(cornerRadius: 8).fill(LyricTypography.color(item.element)).frame(width: 40, height: 30)
-                    }
-                    Text(preferences.artworkTheme == nil ? "等待封面 · 中性配色" : "封面主题 / 已唱 / 未唱")
-                        .font(.caption).foregroundStyle(.secondary)
-                }.padding(16)
-                WordColorPreview(preferences: preferences).padding(16)
-            }
-            Group {
-            SettingRow(title: "当前歌词颜色", detail: "逐字进度保留明暗变化，长音保留辉光。") {
-                ColorPicker("当前歌词颜色", selection: Binding(get: { preferences.typography.primary }, set: {
-                    preferences.lyricPrimaryColor = LyricTypography.hex($0)
-                }), supportsOpacity: false).labelsHidden()
-            }
-            SettingRow(title: "翻译与下一句颜色", detail: "独立设置辅助文字颜色。", impact: "过暗的颜色可能在深色背景上难以阅读，可在下方预览检查。") {
-                ColorPicker("辅助文字颜色", selection: Binding(get: { preferences.typography.secondary }, set: {
-                    preferences.lyricSecondaryColor = LyricTypography.hex($0)
-                }), supportsOpacity: false).labelsHidden()
-            }
-            SettingRow(title: "逐字独立配色", detail: "分别设置已唱到和未唱到部分的颜色，同时用于主窗口和悬浮窗。", impact: "只对带逐字时间的当前歌词生效；关闭后恢复原来的明暗高亮。") {
-                Toggle("逐字独立配色", isOn: $preferences.separateWordColors).labelsHidden()
-            }
-            }.disabled(preferences.followArtworkColors)
-            if preferences.separateWordColors && !preferences.followArtworkColors {
-                SettingRow(title: "已唱到的颜色", detail: "进度经过的文字，以及正在唱的文字中已高亮的部分。") {
-                    ColorPicker("已唱到的颜色", selection: Binding(get: { LyricTypography.color(preferences.sungWordColor) }, set: {
-                        preferences.sungWordColor = LyricTypography.hex($0)
+            SettingsCard(title: "主窗口与悬浮窗 · 字体与颜色") {
+                SettingRow(title: "歌词字体", detail: "使用此 Mac 已安装的字体。保持设置字号，自动适配行高；原文、翻译和下一句的字号仍可分别设置。", impact: "缺少字符会使用系统后备字体；卸载所选字体后自动回退到系统字体。") {
+                    Picker("歌词字体", selection: $preferences.lyricFontName) {
+                        Text("系统字体").tag("")
+                        if !preferences.lyricFontName.isEmpty && !Self.fonts.contains(preferences.lyricFontName) {
+                            Text("\(preferences.lyricFontName)（未安装）").tag(preferences.lyricFontName)
+                        }
+                        ForEach(Self.fonts, id: \.self) { name in
+                            Text(Self.fontTitles[name] ?? name).tag(name)
+                        }
+                    }.labelsHidden().frame(width: 220)
+                }
+                SettingToggle(title: "跟随封面主题色", detail: "从当前封面提取配色，并按界面深浅调整对比度。已唱、未唱和翻译保持区分。", impact: "无封面时使用中性配色。自动配色优先于手动配色；关闭即可恢复原来的颜色。复杂背景仍建议使用磨砂阅读。", value: $preferences.followArtworkColors)
+                Label("Liquid Glass 使用默认配色时自动优化可读性；自定义颜色、逐字独立配色或跟随封面时不再额外改色。恢复默认配色后自动恢复优化，无需手动切换。", systemImage: "info.circle")
+                    .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 16)
+                if preferences.followArtworkColors {
+                    HStack(spacing: 12) {
+                        ForEach(Array([preferences.artworkTheme?.accent ?? "BFC7D5", preferences.typography.primaryHex,
+                                 preferences.artworkTheme?.unsung ?? "757575"].enumerated()), id: \.offset) { item in
+                            RoundedRectangle(cornerRadius: 8).fill(LyricTypography.color(item.element)).frame(width: 40, height: 30)
+                        }
+                        Text(preferences.artworkTheme == nil ? "等待封面 · 中性配色" : "封面主题 / 已唱 / 未唱")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }.padding(16)
+                    WordColorPreview(preferences: preferences).padding(16)
+                }
+                Group {
+                SettingRow(title: "当前歌词颜色", detail: "逐字进度保留明暗变化，长音保留辉光。") {
+                    ColorPicker("当前歌词颜色", selection: Binding(get: { preferences.typography.primary }, set: {
+                        preferences.lyricPrimaryColor = LyricTypography.hex($0)
                     }), supportsOpacity: false).labelsHidden()
                 }
-                SettingRow(title: "未唱到的颜色", detail: "当前句中尚未唱到的文字，不会再额外调暗。") {
-                    ColorPicker("未唱到的颜色", selection: Binding(get: { LyricTypography.color(preferences.unsungWordColor) }, set: {
-                        preferences.unsungWordColor = LyricTypography.hex($0)
+                SettingRow(title: "翻译与下一句颜色", detail: "独立设置辅助文字颜色。", impact: "过暗的颜色可能在深色背景上难以阅读，可在下方预览检查。") {
+                    ColorPicker("辅助文字颜色", selection: Binding(get: { preferences.typography.secondary }, set: {
+                        preferences.lyricSecondaryColor = LyricTypography.hex($0)
                     }), supportsOpacity: false).labelsHidden()
                 }
-                WordColorPreview(preferences: preferences).padding(16)
-            }
-            GeometryReader { geometry in
-                let width = max(200, geometry.size.width - 32)
-                OverlayLyricsContent(preferences: preferences, document: Self.sample, index: 0,
-                    lyricTime: { 2 }, playing: false, visible: true, adaptiveCanvasWidth: width)
+                SettingRow(title: "逐字独立配色", detail: "分别设置已唱到和未唱到部分的颜色，同时用于主窗口和悬浮窗。", impact: "只对带逐字时间的当前歌词生效；关闭后恢复原来的明暗高亮。") {
+                    Toggle("逐字独立配色", isOn: $preferences.separateWordColors).labelsHidden()
+                }
+                }.disabled(preferences.followArtworkColors)
+                if preferences.separateWordColors && !preferences.followArtworkColors {
+                    SettingRow(title: "已唱到的颜色", detail: "进度经过的文字，以及正在唱的文字中已高亮的部分。") {
+                        ColorPicker("已唱到的颜色", selection: Binding(get: { LyricTypography.color(preferences.sungWordColor) }, set: {
+                            preferences.sungWordColor = LyricTypography.hex($0)
+                        }), supportsOpacity: false).labelsHidden()
+                    }
+                    SettingRow(title: "未唱到的颜色", detail: "当前句中尚未唱到的文字，不会再额外调暗。") {
+                        ColorPicker("未唱到的颜色", selection: Binding(get: { LyricTypography.color(preferences.unsungWordColor) }, set: {
+                            preferences.unsungWordColor = LyricTypography.hex($0)
+                        }), supportsOpacity: false).labelsHidden()
+                    }
+                    WordColorPreview(preferences: preferences).padding(16)
+                }
+                GeometryReader { geometry in
+                    let width = max(200, geometry.size.width - 32)
+                    OverlayLyricsContent(preferences: preferences, document: Self.sample, index: 0,
+                        lyricTime: { 2 }, playing: false, visible: true, adaptiveCanvasWidth: width)
+                        .padding(16)
+                        .onAppear { previewWidth = width }
+                        .onChange(of: width) { _, value in previewWidth = value }
+                }.frame(height: OverlayTextMeasure.height(document: Self.sample, index: 0,
+                        preferences: preferences, maximumWidth: previewWidth + 60) - OverlayLayoutMetrics.chromeHeight + 32)
+                    .background(.black.opacity(0.85), in: .rect(cornerRadius: 18))
+                    .environment(\.colorScheme, .dark)
                     .padding(16)
-                    .onAppear { previewWidth = width }
-                    .onChange(of: width) { _, value in previewWidth = value }
-            }.frame(height: OverlayTextMeasure.height(document: Self.sample, index: 0,
-                    preferences: preferences, maximumWidth: previewWidth + 60) - OverlayLayoutMetrics.chromeHeight + 32)
-                .background(.black.opacity(0.85), in: .rect(cornerRadius: 18))
-                .environment(\.colorScheme, .dark)
-                .padding(16)
-            HStack {
-                Text("预览使用实际歌词绘制方式；修改后立即生效并保存。").font(.caption).foregroundStyle(.secondary)
-                Spacer()
-                Button("恢复字体与颜色") {
-                    preferences.lyricFontName = ""
-                    preferences.lyricPrimaryColor = "FFFFFF"
-                    preferences.lyricSecondaryColor = "FFFFFF"
-                    preferences.followArtworkColors = false
-                    preferences.separateWordColors = false
-                    preferences.sungWordColor = "FFFFFF"
-                    preferences.unsungWordColor = "757575"
-                }
-            }.padding(16)
+                HStack {
+                    Text("预览使用实际歌词绘制方式；修改后立即生效并保存。").font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("恢复字体与颜色") {
+                        preferences.lyricFontName = ""
+                        preferences.lyricPrimaryColor = "FFFFFF"
+                        preferences.lyricSecondaryColor = "FFFFFF"
+                        preferences.followArtworkColors = false
+                        preferences.separateWordColors = false
+                        preferences.sungWordColor = "FFFFFF"
+                        preferences.unsungWordColor = "757575"
+                    }.id("恢复字体与颜色")
+                }.padding(16)
+            }
         }
     }
 }

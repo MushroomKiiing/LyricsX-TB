@@ -34,7 +34,7 @@ struct HotkeySettingsView: View {
             SettingRow(title: "恢复默认", detail: "全局快捷键在其他应用中也生效；清除后不会占用该组合。") {
                 Button("恢复默认") { settings.restoreDefaults() }
             }
-            SettingRow(title: "搜索歌词", detail: "仅在 LyricsX Next 内打开当前歌曲的版本搜索。") { Text("⌘F").monospaced() }
+            SettingRow(title: "搜索歌词", detail: "仅在 LyricsX TB 内打开当前歌曲的版本搜索。") { Text("⌘F").monospaced() }
         }
         .sheet(item: $recordingAction) { action in
             HotkeyRecordingSheet(settings: settings, action: action)

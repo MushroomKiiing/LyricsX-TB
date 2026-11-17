@@ -23,7 +23,7 @@ struct MainView: View {
             }
             .sheet(isPresented: $model.showSearch) { SearchView(model: model) }
             .sheet(isPresented: $model.showLibrary) { LibraryView(model: model) }
-            .alert("LyricsX Next", isPresented: Binding(get: { model.message != nil }, set: { if !$0 { model.message = nil } })) { Button("好") { model.message = nil } } message: { Text(model.message ?? "") }
+            .alert("LyricsX TB", isPresented: Binding(get: { model.message != nil }, set: { if !$0 { model.message = nil } })) { Button("好") { model.message = nil } } message: { Text(model.message ?? "") }
             .dropDestination(for: URL.self) { urls, _ in
                 guard let url = urls.first, ["lrc", "lrcx", "txt"].contains(url.pathExtension.lowercased()) else { return false }
                 model.importLyrics(url); return true
@@ -32,7 +32,7 @@ struct MainView: View {
     private var header: some View {
         HStack(spacing: 10) {
             Image(systemName: "quote.bubble.fill").font(.system(size: 19)).foregroundStyle(Color.primary.opacity(0.85))
-            Text("LyricsX Next").font(.system(size: 16, weight: .semibold)).tracking(-0.3)
+            Text("LyricsX TB").font(.system(size: 16, weight: .semibold)).tracking(-0.3)
             Spacer()
             HStack(spacing: 9) {
                 SymbolButton(symbol: "magnifyingglass", help: "搜索歌词 ⌘F", ink: .primary) { model.showSearch = true }

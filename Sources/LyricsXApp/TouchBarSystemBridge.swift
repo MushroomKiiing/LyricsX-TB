@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+// Derived from wzk112/LyricsX-Next v2.0.43; local presentation-mode changes.
 import AppKit
 import Darwin
 import ObjectiveC
@@ -12,6 +14,7 @@ import ObjectiveC
         var setPresence: (NSTouchBarItem.Identifier, Bool) -> Void
         var present: (NSTouchBar, NSTouchBarItem.Identifier) -> Void
         var dismiss: (NSTouchBar) -> Void
+        var presentFullWidth: ((NSTouchBar, NSTouchBarItem.Identifier) -> Void)? = nil
     }
 
     private let operations: Operations?
@@ -21,6 +24,7 @@ import ObjectiveC
 
     /// Describes API availability, not the presence of physical Touch Bar hardware.
     var isAvailable: Bool { operations != nil }
+    var supportsFullWidth: Bool { operations?.presentFullWidth != nil }
 
     init() { operations = Runtime.operations() }
 
@@ -48,10 +52,13 @@ import ObjectiveC
     /// A true result means the request was dispatched; system policy and available
     /// hardware still decide whether the bar is shown. It is not display validation.
     @discardableResult
-    func present(_ touchBar: NSTouchBar, itemIdentifier: NSTouchBarItem.Identifier) -> Bool {
+    func present(_ touchBar: NSTouchBar, itemIdentifier: NSTouchBarItem.Identifier, fullWidth: Bool = false) -> Bool {
         guard let operations, installedItems[itemIdentifier] != nil else { return false }
         if let previous = presentedBar, previous !== touchBar { dismiss(previous) }
-        operations.present(touchBar, itemIdentifier)
+        if fullWidth {
+            guard let presentFullWidth = operations.presentFullWidth else { return false }
+            presentFullWidth(touchBar, itemIdentifier)
+        } else { operations.present(touchBar, itemIdentifier) }
         presentedBar = touchBar
         presentedIdentifier = itemIdentifier
         return true
@@ -71,6 +78,7 @@ import ObjectiveC
 
         typealias ItemAction = @convention(c) (AnyObject, Selector, AnyObject) -> Void
         typealias PresentAction = @convention(c) (AnyObject, Selector, AnyObject, AnyObject) -> Void
+        typealias PlacementAction = @convention(c) (AnyObject, Selector, AnyObject, Int64, AnyObject) -> Void
         // Objective-C BOOL is signed char on Intel and bool on Apple Silicon.
         // ObjCBool preserves that ABI instead of assuming Swift Bool on both.
         typealias PresenceAction = @convention(c) (NSString, ObjCBool) -> Void
@@ -92,19 +100,34 @@ import ObjectiveC
             // ABI declarations are based on the existing legacy dependency:
             // ddddxxx/TouchBarHelper @ 003d41193ac1c6ab9cc570a1923587298014bf1d,
             // Sources/DFRPrivate/include/DFRPrivateHeader.h. No close-box setting,
-            // placement override, simulator activation or global strip setting is used.
+            // simulator activation or global strip setting is used. Full width uses only this modal’s placement.
             let add = unsafeBitCast(method_getImplementation(addMethod), to: ItemAction.self)
             let remove = unsafeBitCast(method_getImplementation(removeMethod), to: ItemAction.self)
             let present = unsafeBitCast(method_getImplementation(presentMethod), to: PresentAction.self)
             let dismiss = unsafeBitCast(method_getImplementation(dismissMethod), to: ItemAction.self)
             let presence = unsafeBitCast(presenceSymbol, to: PresenceAction.self)
-            return Operations(
+            var result = Operations(
                 addItem: { add(NSTouchBarItem.self, addSelector, $0) },
                 removeItem: { remove(NSTouchBarItem.self, removeSelector, $0) },
                 setPresence: { presence($0.rawValue as NSString, ObjCBool($1)) },
                 present: { present(NSTouchBar.self, presentSelector, $0, $1.rawValue as NSString) },
                 dismiss: { dismiss(NSTouchBar.self, dismissSelector, $0) }
             )
+            let placementSelector = NSSelectorFromString("presentSystemModalTouchBar:placement:systemTrayItemIdentifier:")
+            if let method = class_getClassMethod(NSTouchBar.self, placementSelector), method_getNumberOfArguments(method) == 5 {
+                let types = (0..<5).map { index -> String in
+                    guard let value = method_copyArgumentType(method, UInt32(index)) else { return "" }
+                    defer { free(value) }; return String(cString: value)
+                }
+                let returnType = method_copyReturnType(method)
+                defer { free(returnType) }
+                if String(cString: returnType) == "v", types[2].hasPrefix("@"), types[3] == "q", types[4].hasPrefix("@") {
+                    let action = unsafeBitCast(method_getImplementation(method), to: PlacementAction.self)
+                    // MTMR uses placement 1 to replace the Control Strip for this modal only.
+                    result.presentFullWidth = { action(NSTouchBar.self, placementSelector, $0, 1, $1.rawValue as NSString) }
+                }
+            }
+            return result
         }
 
         private static func checkedClassMethod(_ type: AnyClass, selector: Selector, objects: UInt32) -> Method? {

@@ -1116,7 +1116,7 @@ private struct OverlaySongCard: View {
             .clipShape(.rect(cornerRadius: 9))
             .animation(animated ? .easeInOut(duration: 0.45) : nil, value: artwork.map(ObjectIdentifier.init))
             VStack(alignment: .leading, spacing: 4) {
-                Text(display.track?.title ?? "LyricsX Next")
+                Text(display.track?.title ?? "LyricsX TB")
                     .font(.system(size: layout.title, weight: .semibold)).lineLimit(2).minimumScaleFactor(0.85)
                 if let artist = display.track?.artist, !artist.isEmpty {
                     Text(artist).font(.system(size: layout.artist, weight: .medium)).lineLimit(1).opacity(0.8)
@@ -1151,7 +1151,7 @@ private struct OverlaySongHeader: View {
     @Environment(\.colorScheme) private var colorScheme
     var body: some View {
         HStack(spacing: 6) {
-            Text(display.track?.title ?? "LyricsX Next").lineLimit(1)
+            Text(display.track?.title ?? "LyricsX TB").lineLimit(1)
             if let artist = display.track?.artist, !artist.isEmpty { Text("· " + artist).lineLimit(1).opacity(0.85) }
             Spacer(minLength: 4)
             Color.clear.frame(width: OverlayControlLayout.headerReservation, height: 30)

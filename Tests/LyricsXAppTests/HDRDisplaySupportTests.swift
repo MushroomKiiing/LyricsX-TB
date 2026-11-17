@@ -81,23 +81,27 @@ import SwiftUI
         first.contentView = a; second.contentView = b
         first.orderFrontRegardless(); second.orderFrontRegardless()
         try await Task.sleep(for: .milliseconds(750))
-        #expect(a.edrSurface.requestedHeadroom == 2)
-        #expect(b.edrSurface.requestedHeadroom == 3)
+        // Native output is capped by the attached display. A 2x EDR panel
+        // cannot satisfy the second window's 3x content request.
+        let firstExpected = min(2, HDRDisplayCapability(screen: try #require(first.screen)).renderHeadroom)
+        let secondExpected = min(3, HDRDisplayCapability(screen: try #require(second.screen)).renderHeadroom)
+        #expect(a.edrSurface.requestedHeadroom == firstExpected)
+        #expect(b.edrSurface.requestedHeadroom == secondExpected)
         let secondSubmissions = b.edrSurface.presentationCount
         first.orderOut(nil)
         try await Task.sleep(for: .milliseconds(300))
         #expect(a.edrSurface.requestedHeadroom == 1)
         #expect(!a.edrSurface.layer.wantsExtendedDynamicRangeContent)
-        #expect(b.edrSurface.requestedHeadroom == 3)
+        #expect(b.edrSurface.requestedHeadroom == secondExpected)
         #expect(b.edrSurface.presentationCount == secondSubmissions)
         first.orderFrontRegardless()
         try await Task.sleep(for: .milliseconds(750))
-        #expect(a.edrSurface.requestedHeadroom == 2)
+        #expect(a.edrSurface.requestedHeadroom == firstExpected)
         b.contentVisible = false
         #expect(b.edrSurface.requestedHeadroom == 1)
         b.contentVisible = true
         try await Task.sleep(for: .milliseconds(260))
-        #expect(b.edrSurface.requestedHeadroom == 3)
+        #expect(b.edrSurface.requestedHeadroom == secondExpected)
         second.contentView = nil
         #expect(b.edrSurface.requestedHeadroom == 1)
         #expect(b.edrSurface.layer.device == nil)

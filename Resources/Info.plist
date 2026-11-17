@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh_CN</string>
 	<key>CFBundleDisplayName</key>
-	<string>LyricsX Next</string>
+	<string>LyricsX TB</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -29,19 +29,21 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.lyricsx.modern</string>
 	<key>CFBundleName</key>
-	<string>LyricsX Next</string>
+	<string>LyricsX TB</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>2.0.43</string>
 	<key>CFBundleVersion</key>
-	<string>279</string>
+	<string>279.8</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>26.0</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>LyricsXReleaseVersion</key>
+	<string>2.0.43-TB.5-preview.1</string>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>LyricsX Next 读取当前歌曲和播放进度，以显示同步歌词，并响应你的播放控制。</string>
+	<string>LyricsX TB 读取当前歌曲和播放进度，以显示同步歌词，并响应你的播放控制。</string>
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>仅在你开启悬浮窗实时波形时，捕获当前播放器的音频以绘制波形。</string>
 	<key>NSHighResolutionCapable</key>

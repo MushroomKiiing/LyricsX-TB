@@ -2,9 +2,11 @@ import SwiftUI
 import ServiceManagement
 import LyricsXServices
 
-enum SettingsSection: String, CaseIterable, Identifiable {
-    case general = "通用", player = "播放器", overlay = "悬浮窗", lyrics = "歌词"
-    case effects = "动效", sources = "搜索", developer = "开发者选项", about = "关于"
+enum SettingsSection: String, CaseIterable, Identifiable, Sendable {
+    case general = "通用", lyrics = "歌词", sync = "歌词同步", sources = "搜索"
+    case player = "播放器", overlay = "悬浮窗", touchBar = "Touch Bar"
+    case appearance = "外观", typography = "字体与颜色", effects = "动效"
+    case developer = "开发者选项", about = "关于"
     var id: String { rawValue }
     var symbol: String {
         switch self {
@@ -12,6 +14,10 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         case .player: "play.circle"
         case .overlay: "rectangle.on.rectangle"
         case .lyrics: "text.alignleft"
+        case .appearance: "paintbrush"
+        case .typography: "paintpalette"
+        case .sync: "clock.arrow.circlepath"
+        case .touchBar: "rectangle.bottomthird.inset.filled"
         case .effects: "waveform"
         case .sources: "magnifyingglass"
         case .developer: "curlybraces"
@@ -22,12 +28,29 @@ enum SettingsSection: String, CaseIterable, Identifiable {
         switch self {
         case .general: "启动方式、Dock 与菜单栏。"
         case .player: "选择播放状态的读取来源。"
-        case .overlay: "调整桌面歌词的尺寸、背景与操作方式。"
-        case .lyrics: "文字、翻译与辅助行的显示方式。"
+        case .overlay: "桌面歌词的内容、尺寸与操作方式。"
+        case .lyrics: "翻译、中文显示与主窗口文字大小。"
+        case .appearance: "界面主题、悬浮窗材质与背景。"
+        case .typography: "歌词字体、配色与各显示位置的适用范围。"
+        case .sync: "通用与单曲歌词时间偏移。"
+        case .touchBar: "歌词、后台显示、全宽切换与左右翻译。"
         case .effects: "换句、逐字和长音的视觉效果。"
         case .sources: "选择歌词来源与版本偏好。"
         case .developer: "歌词文件、访问令牌和批量数据操作。"
         case .about: "版本、开源项目与许可。"
+        }
+    }
+}
+
+enum SettingsGroup: String, CaseIterable, Identifiable {
+    case common = "常用设置", displays = "播放与显示", appearance = "外观", other = "其他"
+    var id: String { rawValue }
+    var sections: [SettingsSection] {
+        switch self {
+        case .common: [.general, .lyrics, .sync, .sources]
+        case .displays: [.player, .overlay, .touchBar]
+        case .appearance: [.appearance, .typography, .effects]
+        case .other: [.developer, .about]
         }
     }
 }
@@ -80,10 +103,15 @@ struct PreferencesView: View {
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @State private var selection: SettingsSection? = .general
     @State private var sidebarVisible = true
+    @State private var searchQuery = ""
+    @State private var searchTarget: String?
+    @FocusState private var searchFocused: Bool
     @State private var token = ""
     @State private var tokenMessage = ""
     @State private var loginChangePending = false
     @State private var loginStatus = SMAppService.mainApp.status
+    @State private var neteaseLaunchStatus = NetEaseLaunchService.agent.status
+    @State private var neteaseLaunchPending = false
     @State private var settingsError: String?
     @State private var showMotionPreview = false
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
@@ -127,20 +155,33 @@ struct PreferencesView: View {
                         Button("完成") { dismiss() }
                     }
                     .padding(.horizontal, SettingsLayout.inset).padding(.vertical, 14)
+                    searchField
+                        .padding(.horizontal, SettingsLayout.inset).padding(.bottom, 12)
                     Divider()
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 20) { settingsContent }
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 20) {
+                                if isSearching { searchResults }
+                                else { settingsContent }
+                            }
                             .frame(width: SettingsLayout.readingWidth(windowWidth: window.size.width), alignment: .leading)
                             .padding(SettingsLayout.inset).frame(maxWidth: .infinity)
+                            .task(id: searchTarget) {
+                                guard !isSearching, let searchTarget else { return }
+                                await Task.yield()
+                                proxy.scrollTo(searchTarget, anchor: .top)
+                            }
+                        }
+                        .id(isSearching ? "settings-search" : (selection ?? .general).id)
+                        .scrollBounceBehavior(.basedOnSize)
                     }
-                    .id(selection)
-                    .scrollBounceBehavior(.basedOnSize)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(nsColor: .windowBackgroundColor))
             }
         }
         .frame(minWidth: 760, idealWidth: 860, minHeight: 580, idealHeight: 700)
+        .environment(\.settingsSearchHighlight, searchTarget)
         .preferredColorScheme(model.preferences.appTheme.colorScheme)
         .task { model.displays.refresh(); refreshLoginStatus() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in refreshLoginStatus() }
@@ -162,20 +203,115 @@ struct PreferencesView: View {
         } message: { Text(settingsError ?? "") }
     }
 
+    private var isSearching: Bool { !searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+
+    private var searchField: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+            TextField("搜索设置", text: $searchQuery)
+                .textFieldStyle(.plain).focused($searchFocused)
+                .accessibilityLabel("搜索设置")
+                .onExitCommand { searchQuery = ""; searchFocused = false }
+            if !searchQuery.isEmpty {
+                Button { searchQuery = ""; searchTarget = nil } label: { Image(systemName: "xmark.circle.fill") }
+                    .buttonStyle(.plain).foregroundStyle(.secondary).accessibilityLabel("清除设置搜索")
+            }
+        }
+        .padding(.horizontal, 10).padding(.vertical, 8)
+        .background(Color(nsColor: .controlBackgroundColor), in: .rect(cornerRadius: 8))
+        .overlay { RoundedRectangle(cornerRadius: 8).strokeBorder(.separator.opacity(0.5), lineWidth: 0.5) }
+    }
+
+    private func searchAnchor(for entry: SettingsSearchEntry) -> String {
+        let p = model.preferences
+        switch (entry.section, entry.title) {
+        case (.touchBar, "恢复全宽的等待时间") where !p.touchBarAutoFullWidth,
+             (.touchBar, "固定全宽显示") where p.touchBarAutoFullWidth:
+            return "闲置后自动全宽"
+        case (.lyrics, "主窗口翻译字号") where !p.showTranslation: return "显示翻译"
+        case (.overlay, "翻译字号") where !p.showTranslation || !p.overlaySecondaryMode.supportsTranslation,
+             (.overlay, "下一句字号") where !p.overlaySecondaryMode.supportsNext: return "翻译与下一句"
+        case (.overlay, "波形颜色") where !p.overlayWaveformEnabled,
+             (.overlay, "音频采集") where !p.overlayWaveformEnabled:
+            return "显示实时波形"
+        case (.appearance, "底色透明度"), (.appearance, "透明度"):
+            return p.overlayAppearance == .glass ? "底色透明度" : "透明度"
+        case (.appearance, "悬浮窗颜色") where p.overlayAppearance == .glass,
+             (.appearance, "磨砂程度") where p.overlayAppearance == .glass,
+             (.appearance, "歌词配色") where p.overlayAppearance != .glass: return "悬浮窗背景"
+        case (.lyrics, "距歌词区域顶部") where p.mainLyricPosition != .custom: return "主窗口当前歌词位置"
+        case (.typography, "已唱到的颜色"), (.typography, "未唱到的颜色"):
+            if p.followArtworkColors { return "跟随封面主题色" }
+            return p.separateWordColors ? entry.anchor : "逐字独立配色"
+        case (.effects, "HDR 亮度倍数"):
+            if !p.lyricGlow || p.reduceMotion || systemReduceMotion { return "长音辉光" }
+            return p.lyricHDR ? entry.anchor : "HDR 辉光增强"
+        case (.effects, "HDR 辉光增强") where !p.lyricGlow || p.reduceMotion || systemReduceMotion:
+            return "长音辉光"
+        default: return entry.anchor
+        }
+    }
+
+    private var searchResults: some View {
+        let matches = SettingsSearchIndex.results(for: searchQuery)
+        return VStack(alignment: .leading, spacing: 18) {
+            Text("搜索结果 · \(matches.count) 项").font(.headline)
+            if matches.isEmpty {
+                ContentUnavailableView.search(text: searchQuery)
+            } else {
+                ForEach(SettingsSection.allCases) { section in
+                    let entries = matches.filter { $0.section == section }
+                    if !entries.isEmpty {
+                        SettingsCard(title: section.rawValue) {
+                            ForEach(entries) { entry in
+                                Button {
+                                    selection = entry.section
+                                    searchTarget = searchAnchor(for: entry)
+                                    searchQuery = ""
+                                    searchFocused = false
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(entry.title).font(.body.weight(.medium)).foregroundStyle(.primary)
+                                            Text(entry.detail).font(.callout).foregroundStyle(.secondary)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        Spacer(minLength: 8)
+                                        Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+                                    }
+                                    .padding(14).frame(maxWidth: .infinity, alignment: .leading).contentShape(.rect)
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(entry.section.rawValue + "，" + entry.title)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("偏好设置").font(.caption.weight(.medium)).foregroundStyle(.secondary)
                 .padding(.horizontal, 18).padding(.top, 20).padding(.bottom, 10)
             ScrollView {
                 VStack(spacing: 3) {
-                    ForEach(SettingsSection.allCases) { section in
-                        if section == .developer { Divider().padding(.vertical, 9).padding(.horizontal, 10) }
-                        SettingsSidebarItem(section: section, selected: selection == section,
-                                            reducedMotion: systemReduceMotion || model.preferences.reduceMotion) { selection = section }
+                    ForEach(SettingsGroup.allCases) { group in
+                        Text(group.rawValue).font(.caption2.weight(.medium)).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 10).padding(.top, 10).padding(.bottom, 3)
+                            .accessibilityAddTraits(.isHeader)
+                        ForEach(group.sections) { section in
+                            SettingsSidebarItem(section: section, selected: selection == section,
+                                                reducedMotion: systemReduceMotion || model.preferences.reduceMotion) {
+                                                    selection = section; searchQuery = ""; searchTarget = nil; searchFocused = false
+                                                }
+                        }
                     }
                 }.padding(.horizontal, 10)
             }.scrollBounceBehavior(.basedOnSize)
-            Text("LyricsX Next").font(.caption).foregroundStyle(.tertiary)
+            Text("LyricsX TB").font(.caption).foregroundStyle(.tertiary)
                 .padding(20)
         }
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.55))
@@ -188,6 +324,10 @@ struct PreferencesView: View {
         case .player: playerSettings
         case .overlay: overlaySettings
         case .lyrics: lyricSettings
+        case .appearance: appearanceSettings
+        case .typography: LyricTypographySettings(preferences: model.preferences)
+        case .sync: synchronizationSettings
+        case .touchBar: touchBarSettings
         case .effects: effectSettings
         case .sources: sourceSettings
         case .developer: developerSettings
@@ -198,11 +338,8 @@ struct PreferencesView: View {
     private var generalSettings: some View {
         @Bindable var p = model.preferences
         return Group {
-            SettingsCard(title: "外观") {
-                InterfaceThemePicker(title: "应用界面", detail: "主窗口、设置和其他应用页面的颜色。悬浮窗可单独设置。", selection: $p.appTheme)
-            }
             SettingsCard(title: "应用入口") {
-                SettingToggle(title: "在 Dock 中显示", detail: "显示屏幕底部的 LyricsX Next 图标。关闭后仍可用 ⌥⌘O 打开主窗口。", value: $p.showDockIcon)
+                SettingToggle(title: "在 Dock 中显示", detail: "显示屏幕底部的 LyricsX TB 图标。关闭后可从菜单栏、已设置的快捷键或重新打开应用进入主窗口。", value: $p.showDockIcon)
                 Divider().padding(.horizontal, 14)
                 SettingToggle(title: "菜单栏图标", detail: "在屏幕顶部保留播放器、歌词搜索和设置入口。", value: $p.showMenuBarIcon)
                 SettingToggle(title: "菜单栏歌词", detail: "在屏幕顶部显示当前一句；长句会截短，完整歌词不受影响。", value: $p.showMenubarLyrics)
@@ -210,7 +347,7 @@ struct PreferencesView: View {
                     .disabled(!p.showMenuBarIcon || !p.showMenubarLyrics)
             }
             SettingsCard(title: "启动") {
-                SettingToggle(title: "登录时启动", detail: "登录 macOS 后自动运行 LyricsX Next。", impact: "会在后台读取播放状态；可随时关闭。", value: Binding(
+                SettingToggle(title: "登录时启动", detail: "登录 macOS 后自动运行 LyricsX TB。", impact: "会在后台读取播放状态；可随时关闭。", value: Binding(
                     get: { p.launchAtLogin || loginStatus == .requiresApproval }, set: { enabled in
                         guard !loginChangePending else { return }
                         loginChangePending = true
@@ -222,8 +359,27 @@ struct PreferencesView: View {
                             } catch { settingsError = error.localizedDescription }
                         }
                     })).disabled(loginChangePending)
+                Divider().padding(.horizontal, 14)
+                SettingToggle(title: "随网易云启动", detail: "打开网易云音乐时在后台启动 LyricsX TB。开启此功能时，退出歌词软件后仍会监听，关闭此开关即停止。", impact: "隐私：只在本机识别网易云应用的启动事件，不读取歌曲、音频或窗口内容，不联网、不保存记录。", value: Binding(
+                    get: { neteaseLaunchStatus == .enabled || neteaseLaunchStatus == .requiresApproval },
+                    set: { enabled in
+                        guard !neteaseLaunchPending else { return }
+                        neteaseLaunchPending = true
+                        Task {
+                            defer { neteaseLaunchPending = false; refreshLoginStatus() }
+                            do {
+                                if enabled { try NetEaseLaunchService.agent.register() }
+                                else { try await NetEaseLaunchService.agent.unregister() }
+                            } catch { settingsError = error.localizedDescription }
+                        }
+                    })).disabled(neteaseLaunchPending)
+                if neteaseLaunchStatus == .requiresApproval {
+                    SettingRow(title: "联动启动等待系统允许", detail: "请在系统设置的登录项中允许 LyricsX TB 的后台活动，允许后才会监听网易云启动。") {
+                        Button("打开系统设置") { SMAppService.openSystemSettingsLoginItems() }
+                    }
+                }
                 if loginStatus == .requiresApproval {
-                    SettingRow(title: "等待系统允许", detail: "请在系统设置的登录项中允许 LyricsX Next 后台启动。") {
+                    SettingRow(title: "等待系统允许", detail: "请在系统设置的登录项中允许 LyricsX TB 后台启动。") {
                         Button("打开系统设置") { SMAppService.openSystemSettingsLoginItems() }
                     }
                 }
@@ -243,24 +399,22 @@ struct PreferencesView: View {
             SettingRow(title: "重新连接", detail: "在播放信息长时间不更新时重新建立连接。", impact: "读取状态可能短暂刷新，不会切歌或修改音乐资料库。") {
                 Button("重新连接") { model.bridge.restart() }
             }
+            SettingsCard(title: "专辑封面") {
+                SettingToggle(title: "补充高清封面", detail: "仅用于网易云音乐。系统封面清晰度不足时，向网易云匹配高清封面；匹配失败保留播放器封面。", impact: "隐私：向网易云发送当前歌名、歌手、专辑和时长以匹配封面；网易云会收到网络 IP。无需登录，不发送音频。只在内存保留当前歌曲封面，切歌后替换，不保存播放记录或磁盘图片缓存。", value: $p.highResolutionArtwork)
+            }
             if let error = model.playerError {
                 Label(error, systemImage: "exclamationmark.triangle").font(.callout).foregroundStyle(.orange).padding(14)
             }
         }
     }
 
-    private var overlaySettings: some View {
+    private var appearanceSettings: some View {
         @Bindable var p = model.preferences
         return Group {
-            SettingsCard(title: "操作") {
-                SettingToggle(title: "显示悬浮窗", detail: "将当前歌词或歌曲信息放在其他窗口之上。", value: Binding(get: { p.overlayVisible }, set: { model.setOverlayVisible($0) }))
-                SettingToggle(title: "锁定位置", detail: "防止误拖动。悬浮窗控制条上仍可解锁；解锁后恢复拖动。", value: Binding(get: { p.overlayLocked }, set: { model.setOverlayLocked($0) }))
-                SettingToggle(title: "点击穿透", detail: "点击歌词区域会操作后面的应用，控制条仍可使用。", impact: "开启时会锁定位置；解锁会同时关闭穿透。", value: Binding(get: { p.overlayClickThrough }, set: { model.setOverlayClickThrough($0) }))
-                SettingToggle(title: "鼠标经过时隐藏", detail: p.overlayLocked ? "鼠标经过歌词会暂时隐藏内容，离开后恢复。" : "需要先锁定位置；解锁时暂不生效，保留你的选择。", value: $p.hideOverlayOnHover)
-                SettingToggle(title: "暂停时隐藏", detail: "暂停音乐时隐藏悬浮窗，继续播放后恢复。", value: $p.hideWhenPaused)
+            SettingsCard(title: "界面主题") {
+                InterfaceThemePicker(title: "应用界面", detail: "主窗口、设置和其他应用页面的颜色。悬浮窗可单独设置。", selection: $p.appTheme)
             }
-            SettingsCard(title: "外观") {
-                SettingToggle(title: "显示顶部歌曲信息", detail: "显示歌词上方的歌名和艺人；关闭后保留歌词位置，无歌词时的歌曲卡片仍显示。", value: $p.overlayShowSongInfo)
+            SettingsCard(title: "悬浮窗背景") {
                 if p.overlayAppearance == .frosted {
                     InterfaceThemePicker(title: "悬浮窗颜色", detail: "独立设置磨砂悬浮窗与控制条的深浅。", selection: $p.overlayTheme)
                     Divider().padding(.horizontal, 14)
@@ -288,10 +442,41 @@ struct PreferencesView: View {
                     SettingSlider(title: "磨砂程度", detail: "柔化后方文字与图案，歌词文字保持清晰。", impact: "数值越高，背景细节越少；0% 仍保留材质自带的柔化效果。系统“降低透明度”开启时此调节不生效。", value: $p.overlayFrostAmount, range: OverlayAppearance.frostRange, step: 0.02, suffix: "%", multiplier: 100).disabled(systemReduceTransparency)
                 }
             }
+        }
+    }
+
+    private var overlaySettings: some View {
+        @Bindable var p = model.preferences
+        return Group {
+            SettingsCard(title: "操作") {
+                SettingToggle(title: "显示悬浮窗", detail: "将当前歌词或歌曲信息放在其他窗口之上。", value: Binding(get: { p.overlayVisible }, set: { model.setOverlayVisible($0) }))
+                SettingToggle(title: "锁定位置", detail: "防止误拖动。悬浮窗控制条上仍可解锁；解锁后恢复拖动。", value: Binding(get: { p.overlayLocked }, set: { model.setOverlayLocked($0) }))
+                SettingToggle(title: "点击穿透", detail: "点击歌词区域会操作后面的应用，控制条仍可使用。", impact: "开启时会锁定位置；解锁会同时关闭穿透。", value: Binding(get: { p.overlayClickThrough }, set: { model.setOverlayClickThrough($0) }))
+                SettingToggle(title: "鼠标经过时隐藏", detail: p.overlayLocked ? "鼠标经过歌词会暂时隐藏内容，离开后恢复。" : "需要先锁定位置；解锁时暂不生效，保留你的选择。", value: $p.hideOverlayOnHover)
+                SettingToggle(title: "暂停时隐藏", detail: "暂停时自动隐藏，继续播放后恢复。暂停期间手动显示悬浮窗时，会暂时保留显示。", value: $p.hideWhenPaused)
+            }
+            SettingsCard(title: "悬浮窗内容") {
+                SettingToggle(title: "显示顶部歌曲信息", detail: "显示歌词上方的歌名和艺人；关闭后保留歌词位置，无歌词时的歌曲卡片仍显示。", value: $p.overlayShowSongInfo)
+                SettingRow(title: "翻译与下一句", detail: p.showTranslation
+                    ? "选择在悬浮窗原文下显示什么。隐藏翻译请选择“仅下一句”或“都不显示”；“翻译或下一句”在无译文时显示下一句。"
+                    : "翻译总开关已关闭，译文暂不显示；可继续显示下一句。要显示译文，请先在“歌词”页开启“显示翻译”。") {
+                    Picker("翻译与下一句", selection: $p.overlaySecondaryMode) {
+                        ForEach(OverlaySecondaryMode.allCases) { Text($0.title).tag($0) }
+                    }.labelsHidden().frame(width: 150)
+                }
+            }
             SettingsCard(title: "尺寸") {
                 SettingToggle(title: "自动调整高度", detail: "宽度固定，只随当前歌词换行调整高度；顶部位置保持不变。", value: $p.overlayAdaptiveSize)
                 SettingSlider(title: "窗口宽度", detail: p.overlayAdaptiveSize ? "当前固定为 \(Int(p.overlayLayoutWidth)) pt。关闭自动高度后可手动修改。" : "同时调整歌词与歌曲信息卡片的可用宽度。", value: $p.overlayWidth, range: 320...1000, step: 20)
                     .disabled(p.overlayAdaptiveSize)
+            }
+            SettingsCard(title: "悬浮窗文字") {
+                SettingSlider(title: "当前句字号", detail: "调整主歌词大小，辅助行保留独立字号。", value: $p.fontSize, range: 18...42)
+                if p.showTranslation && p.overlaySecondaryMode.supportsTranslation { SettingSlider(title: "翻译字号", detail: "调整悬浮窗译文大小，长译文最多显示两行。", value: $p.translationFontSize, range: 10...24) }
+                if p.overlaySecondaryMode.supportsNext { SettingSlider(title: "下一句字号", detail: "调整悬浮窗下一句预览的文字大小。", value: $p.nextLineFontSize, range: 10...24) }
+            }
+            SettingsCard(title: "悬浮窗文字间距") {
+                OverlayTextSpacingSettings(preferences: p)
             }
             SettingsCard(title: "音频波形") {
                 SettingToggle(title: "显示实时波形", detail: "在悬浮窗底部显示当前播放器的音频波形；首次开启时 macOS 会请求系统音频录制权限。", value: $p.overlayWaveformEnabled)
@@ -314,9 +499,8 @@ struct PreferencesView: View {
     private var lyricSettings: some View {
         @Bindable var p = model.preferences
         return Group {
-            LyricTypographySettings(preferences: p)
             SettingsCard(title: "文字") {
-                SettingToggle(title: "显示翻译", detail: "在有翻译的歌词中显示译文，同时影响主窗口和悬浮窗。", value: $p.showTranslation)
+                SettingToggle(title: "显示翻译", detail: "控制主窗口、悬浮窗与 Touch Bar 的翻译。主窗口跟随此开关；悬浮窗在“翻译与下一句”选择内容，Touch Bar 可在自己的页面关闭翻译。", value: $p.showTranslation)
                 SettingRow(title: "中文显示", detail: "只转换界面中的简繁体，不改写原歌词文件。") {
                     Picker("中文显示", selection: $p.conversion) {
                         ForEach(["原文", "简体", "繁體"], id: \.self) { Text($0) }
@@ -326,22 +510,45 @@ struct PreferencesView: View {
                 MainLyricPositionSettings(preferences: p)
                 if p.showTranslation { SettingSlider(title: "主窗口翻译字号", detail: "独立调整应用内译文大小。", value: $p.mainTranslationFontSize, range: 11...24) }
             }
-            SettingsCard(title: "悬浮窗文字") {
-                SettingSlider(title: "当前句字号", detail: "调整主歌词大小，辅助行保留独立字号。", value: $p.fontSize, range: 18...42)
-                SettingRow(title: "辅助内容", detail: "“翻译或下一句”优先显示译文，没有译文时显示下一句；“仅翻译”不会回退。") {
-                    Picker("辅助内容", selection: $p.overlaySecondaryMode) {
-                        ForEach(OverlaySecondaryMode.allCases) { Text($0.title).tag($0) }
-                    }.labelsHidden().frame(width: 150)
-                }
-                if p.showTranslation && p.overlaySecondaryMode.supportsTranslation { SettingSlider(title: "翻译字号", detail: "调整悬浮窗译文大小，长译文最多显示两行。", value: $p.translationFontSize, range: 10...24) }
-                if p.overlaySecondaryMode.supportsNext { SettingSlider(title: "下一句字号", detail: "调整下一句预览大小，换句时会放大并上移为当前句。", value: $p.nextLineFontSize, range: 10...24) }
-            }
-            SettingsCard(title: "悬浮窗文字间距") {
-                OverlayTextSpacingSettings(preferences: p)
-            }
+
+        }
+    }
+
+    private var synchronizationSettings: some View {
+        @Bindable var p = model.preferences
+        return Group {
             SettingsCard(title: "同步") {
                 GlobalLyricOffsetSettings(preferences: p)
                 SettingRow(title: "单曲歌词偏移", detail: "在主窗口底部、悬浮窗的“歌词同步”或菜单栏调整；在通用偏移的基础上微调当前歌曲。", impact: "单曲偏移保存到当前歌词文件，重置单曲不会清除通用偏移。") { EmptyView() }
+            }
+        }
+    }
+
+    private var touchBarSettings: some View {
+        @Bindable var p = model.preferences
+        return Group {
+            SettingsCard(title: "Touch Bar 歌词") {
+                SettingToggle(title: "在 Touch Bar 上显示歌词", detail: "使用 MacBook Pro 内置 Touch Bar 显示当前歌词。关闭后立即恢复系统原有内容。", value: $p.touchBarEnabled)
+                SettingToggle(title: "后台显示", detail: "切到其他应用后继续显示歌词，并保留气泡图标入口。", value: $p.touchBarBackgroundEnabled).disabled(!p.touchBarEnabled)
+                Text(model.touchBar.status).font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14).padding(.bottom, 10)
+            }
+            SettingsCard(title: "全宽与普通模式") {
+                SettingToggle(title: "闲置后自动全宽", detail: "点按全宽歌词或两侧空白，切回歌词与右侧系统控制条；闲置后恢复全宽。", value: $p.touchBarAutoFullWidth)
+                    .disabled(!p.touchBarEnabled || !model.touchBar.supportsFullWidth)
+                if p.touchBarAutoFullWidth {
+                    SettingSlider(title: "恢复全宽的等待时间", detail: "从普通歌词模式返回全宽的等待秒数。", value: $p.touchBarIdleSeconds, range: 1...15, step: 1, suffix: " 秒")
+                        .disabled(!p.touchBarEnabled)
+                } else {
+                    SettingToggle(title: "固定全宽显示", detail: "占用整条 Touch Bar 并居中显示歌词；关闭后左侧显示歌词、右侧保留系统控制条。", value: $p.touchBarFullWidth)
+                        .disabled(!p.touchBarEnabled || !model.touchBar.supportsFullWidth)
+                }
+            }
+            SettingsCard(title: "文字与翻译") {
+                SettingToggle(title: "显示歌词翻译", detail: p.showTranslation ? "原文在左、已有译文在右，两栏独立滚动；没有译文时原文居中。" : "翻译总开关已关闭；请先在“歌词”页开启“显示翻译”。", value: $p.touchBarShowTranslation)
+                    .disabled(!p.touchBarEnabled || !p.showTranslation)
+                SettingRow(title: "当前歌曲预览", detail: "使用与实体 Touch Bar 相同的歌词绘制组件。") {
+                    Button("打开预览") { model.touchBar.showPreview() }
+                }
             }
         }
     }
@@ -373,7 +580,7 @@ struct PreferencesView: View {
         @Bindable var p = model.preferences
         let unavailable = !p.lyricGlow || p.reduceMotion || systemReduceMotion
         return SettingsCard(title: "HDR / EDR 辉光") {
-            SettingToggle(title: "HDR 辉光增强", detail: "默认开启，按所在屏幕能力增强长音辉光。普通屏幕自动使用普通亮度。需先开启长音辉光。", impact: "高亮效果可能更刺眼并增加能耗；实际亮度由屏幕和系统决定。", value: $p.lyricHDR)
+            SettingToggle(title: "HDR 辉光增强", detail: "按所在屏幕能力增强长音辉光。普通屏幕自动使用普通亮度；需先开启长音辉光。", impact: "高亮效果可能更刺眼并增加能耗；实际亮度由屏幕和系统决定。", value: $p.lyricHDR)
                 .disabled(unavailable)
             if p.lyricHDR {
             HDRBrightnessControl(value: $p.lyricHDRBrightness)
@@ -426,15 +633,6 @@ struct PreferencesView: View {
                 SettingToggle(title: "在 Flexbar 上显示歌词", detail: "通过 FlexDesigner 歌词插件显示当前歌词。", value: $p.flexbarEnabled)
                 Text(model.flexbar.status).font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14)
             }
-            SettingsCard(title: "MacBook Pro Touch Bar") {
-                SettingToggle(title: "在 Touch Bar 上显示歌词", detail: "在配备内置 Touch Bar 的 MacBook Pro 上显示歌词、封面和播放控制，无需安装插件。", value: $p.touchBarEnabled)
-                SettingToggle(title: "后台入口（实验性）", detail: "切到其他应用后，在控制条提供歌词入口，点按可展开。系统不支持时仍可使用前台歌词。", value: $p.touchBarBackgroundEnabled)
-                    .disabled(!p.touchBarEnabled)
-                Text(model.touchBar.status).font(.caption).foregroundStyle(.secondary).padding(.horizontal, 14)
-                SettingRow(title: "Touch Bar 预览", detail: "用当前歌曲预览实际歌词控件；屏幕预览不能验证实体触控条。") {
-                    Button("打开预览") { model.touchBar.showPreview() }
-                }
-            }
             SettingsCard(title: "歌词文件夹") {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("当前路径").font(.body.weight(.medium))
@@ -486,7 +684,7 @@ struct PreferencesView: View {
                 }
             }
             SettingsCard(title: "搜索排除记录") {
-                SettingRow(title: "恢复全部歌词搜索", detail: "已停用 \(p.blockedTracks.count) 首歌曲、\(p.blockedAlbums.count) 张专辑。", impact: "会清空排除记录，之前因匹配错误停用的歌曲也会重新搜索；不会删除歌词文件。") {
+                SettingRow(title: "恢复全部歌词搜索", detail: "已停用 \(p.blockedTracks.count) 首歌曲、\(p.blockedAlbums.count) 张专辑。", impact: "清空歌曲、专辑的停用记录及相关例外，恢复歌词搜索；不会删除歌词文件。") {
                     Button("恢复全部") { p.blockedTracks = []; p.blockedAlbums = []; p.manualLyricOverrides = [:]; model.session.reload() }
                         .disabled(p.blockedTracks.isEmpty && p.blockedAlbums.isEmpty)
                 }
@@ -495,23 +693,27 @@ struct PreferencesView: View {
     }
 
     private var aboutSettings: some View {
-        SettingsCard(title: "LyricsX Next") {
-            SettingRow(title: "Swift 重构版", detail: "版本 \(GuideContent.displayVersion)（\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "本地")） · Zikai Wang") {
+        SettingsCard(title: "LyricsX TB") {
+            SettingRow(title: "Touch Bar 非官方定制版", detail: "版本 \(GuideContent.displayVersion)（\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "本地")）") {
                 Image(systemName: "quote.bubble.fill").font(.largeTitle).foregroundStyle(.pink)
             }
+            SettingRow(title: "项目与署名", detail: "本地修改分支，基于 Zikai Wang（wzk112）的 LyricsX-Next 2.0.43；原项目 ddddxxx/LyricsX 与 MxIris-LyricsX-Project/LyricsX。保留 MPL-2.0 与依赖许可，不代表原作者发布或背书。") { EmptyView() }
             SettingRow(title: "使用指南", detail: "从连接播放器到搜索、悬浮窗、自定义、同步与文件管理，完整图文教程。") {
                 Button("查看教程") { model.showFeatureGuide?(true) }
             }
             SettingRow(title: "本次更新", detail: "重新查看当前版本新增的功能、修复和优化。") {
                 Button("版本介绍") { model.showFeatureGuide?(false) }
             }
-            SettingRow(title: "项目主页", detail: "LyricsX Next 的源代码、说明文档和开发记录。") {
+            SettingRow(title: "LyricsX TB 项目", detail: "本定制版的源码、发布记录及问题反馈。") {
+                Link("打开 GitHub", destination: URL(string: "https://github.com/MushroomKiiing/LyricsX-TB")!)
+            }
+            SettingRow(title: "上游项目主页", detail: "原项目 LyricsX Next 的源码和说明，不是本地定制版的仓库。") {
                 Link("打开 GitHub", destination: URL(string: "https://github.com/wzk112/LyricsX-Next")!)
             }
-            SettingRow(title: "版本与下载", detail: "查看正式版本说明并下载安装包。") {
+            SettingRow(title: "上游版本与下载", detail: "原项目的发布版本，不包含本地 Touch Bar 定制功能。") {
                 Link("查看 Releases", destination: URL(string: "https://github.com/wzk112/LyricsX-Next/releases")!)
             }
-            SettingRow(title: "问题反馈", detail: "报告问题或查看已经记录的问题。") {
+            SettingRow(title: "上游问题记录", detail: "查看原项目的问题记录；本地定制功能尚未发布到该仓库。") {
                 Link("打开 Issues", destination: URL(string: "https://github.com/wzk112/LyricsX-Next/issues")!)
             }
             SettingRow(title: "上游项目", detail: "本版本基于这些开源项目继续开发。") {
@@ -529,6 +731,7 @@ struct PreferencesView: View {
 
     private func refreshLoginStatus() {
         loginStatus = SMAppService.mainApp.status
+        neteaseLaunchStatus = NetEaseLaunchService.agent.status
         model.preferences.launchAtLogin = loginStatus == .enabled
     }
 

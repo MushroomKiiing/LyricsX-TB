@@ -143,7 +143,7 @@ struct TouchBarLyricFrame: Equatable {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineBreakMode = .byClipping
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 15, weight: .medium),
+            .font: NSFont.systemFont(ofSize: 15, weight: .regular),
             .paragraphStyle: paragraph,
             NSAttributedString.Key(kCTForegroundColorFromContextAttributeName as String): true,
         ]
@@ -227,7 +227,7 @@ struct TouchBarLyricFrame: Equatable {
             }
             context.clip(to: clips)
             context.textPosition = CGPoint(x: originX, y: baseline)
-            context.setFillColor(NSColor(srgbRed: 0.2, green: 1, blue: 0.75, alpha: 1).cgColor)
+            context.setFillColor(NSColor.white.cgColor)
             CTLineDraw(shapedLine, context)
             context.restoreGState()
         }
