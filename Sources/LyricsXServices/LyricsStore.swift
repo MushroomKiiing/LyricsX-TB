@@ -10,6 +10,7 @@ public final class LyricsStore: LyricsRepository, Sendable {
     static let completeManualCandidateLimit = 80
     static let compactManualResultsPerSource = 12
     public let cache: LyricsCache
+    private let automaticCacheEnabled: @Sendable () -> Bool
     private let configuration: @Sendable () -> SourceConfiguration
     private let aliasResolver: TrackAliasResolver
     typealias SearchBackend = @Sendable (Track, String?, SourceConfiguration, SecureLyricsHTTPClient) -> AsyncThrowingStream<LyricsDocument, Error>
@@ -20,7 +21,8 @@ public final class LyricsStore: LyricsRepository, Sendable {
     private let searchBudget: Duration
     private let firstResultDelay: Duration
     private let fallbackGrace: Duration
-    public init(cache: LyricsCache = LyricsCache(), configuration: @escaping @Sendable () -> SourceConfiguration = { .init() }) {
+    public init(cache: LyricsCache = LyricsCache(), automaticCacheEnabled: @escaping @Sendable () -> Bool = { true }, configuration: @escaping @Sendable () -> SourceConfiguration = { .init() }) {
+        self.automaticCacheEnabled = automaticCacheEnabled
         self.cache = cache; self.configuration = configuration
         self.appleMusicReader = { try await AppleMusicLyricsSource().document(for: $0) }
         self.appleMusicCloudReader = { track in
@@ -33,18 +35,19 @@ public final class LyricsStore: LyricsRepository, Sendable {
         }
         self.aliasResolver = TrackAliasResolver(); self.searchBackend = Self.providerSearch; self.searchBudget = .seconds(24); self.firstResultDelay = .seconds(1); self.fallbackGrace = .seconds(8)
     }
-    init(cache: LyricsCache, configuration: @escaping @Sendable () -> SourceConfiguration = { .init() },
+    init(cache: LyricsCache, automaticCacheEnabled: @escaping @Sendable () -> Bool = { true }, configuration: @escaping @Sendable () -> SourceConfiguration = { .init() },
          aliasResolver: TrackAliasResolver, searchBudget: Duration = .seconds(24), firstResultDelay: Duration = .seconds(1),
          fallbackGrace: Duration = .seconds(8),
          appleMusicReader: @escaping AppleMusicReader = { AppleMusicLyricsSource.parse($0.embeddedLyrics, for: $0) },
          appleMusicCloudReader: @escaping AppleMusicReader = { _ in nil },
          searchBackend: @escaping SearchBackend) {
+        self.automaticCacheEnabled = automaticCacheEnabled
         self.appleMusicReader = appleMusicReader
         self.appleMusicCloudReader = appleMusicCloudReader
         self.cache = cache; self.configuration = configuration; self.aliasResolver = aliasResolver
         self.searchBackend = searchBackend; self.searchBudget = searchBudget; self.firstResultDelay = firstResultDelay; self.fallbackGrace = fallbackGrace
     }
-    public func save(_ document: LyricsDocument, for track: Track) async throws { if track.playerID != "lyricsx.demo" { try await cache.save(document, for: track) } }
+    public func save(_ document: LyricsDocument, for track: Track) async throws { if automaticCacheEnabled(), track.playerID != "lyricsx.demo" { try await cache.save(document, for: track, shouldWrite: automaticCacheEnabled) } }
     public func lyrics(for track: Track, forceRefresh: Bool) -> AsyncThrowingStream<LyricCandidate, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
@@ -67,8 +70,9 @@ public final class LyricsStore: LyricsRepository, Sendable {
                 guard !Task.isCancelled else { continuation.finish(); return }
                 let searchID = await cache.beginSearch(for: track)
                 defer { Task { await cache.endSearch(for: track, id: searchID) } }
-                let results = AutomaticSearchResults(continuation) { [cache] candidate in
-                    try? await cache.saveCheckpoint(candidate, for: track, searchID: searchID, configuration: selectionKey)
+                let results = AutomaticSearchResults(continuation) { [cache, automaticCacheEnabled] candidate in
+                    guard automaticCacheEnabled() else { return }
+                    try? await cache.saveCheckpoint(candidate, for: track, searchID: searchID, configuration: selectionKey, shouldWrite: automaticCacheEnabled)
                 }
                 if let checkpoint { await results.restore(checkpoint) }
                 let firstDisplay = Task {

@@ -81,8 +81,8 @@ public actor LyricsCache {
         let key = Self.filename(for: track)
         if searches[key]?.id == id { searches.removeValue(forKey: key) }
     }
-    func saveCheckpoint(_ candidate: LyricCandidate, for track: Track, searchID: UUID, configuration: String) throws {
-        guard !Task.isCancelled, candidate.score >= 60,
+    func saveCheckpoint(_ candidate: LyricCandidate, for track: Track, searchID: UUID, configuration: String, shouldWrite: @Sendable () -> Bool = { true }) throws {
+        guard shouldWrite(), !Task.isCancelled, candidate.score >= 60,
               let search = searches[Self.filename(for: track)], search.id == searchID, search.mayCheckpoint else { return }
         let doc = candidate.document
         let state = Checkpoint(title: doc.title, artist: doc.artist, album: doc.album, source: doc.source,
@@ -121,7 +121,8 @@ public actor LyricsCache {
         }
         return nil
     }
-    public func save(_ document: LyricsDocument, for track: Track) throws {
+    public func save(_ document: LyricsDocument, for track: Track, shouldWrite: @Sendable () -> Bool = { true }) throws {
+        guard shouldWrite() else { return }
         searches.removeValue(forKey: Self.filename(for: track))
         try write(document, for: track, checkpoint: nil)
     }
@@ -148,6 +149,32 @@ public actor LyricsCache {
         if let old = try? String(contentsOf: url, encoding: .utf8), old == value { return }
         try value.write(to: url, atomically: true, encoding: .utf8)
         remember(url, for: track)
+    }
+    /// Only immediate, regular lyric files are eligible. Never recurse or
+    /// follow links into another directory; deletion is recoverable in Trash.
+    public func trashLyricsFiles() throws -> Int {
+        try trashLyricsFiles { try FileManager.default.trashItem(at: $0, resultingItemURL: nil) }
+    }
+    func trashLyricsFiles(using moveToTrash: @Sendable (URL) throws -> Void) throws -> Int {
+        let scoped = directory.startAccessingSecurityScopedResource()
+        defer { if scoped { directory.stopAccessingSecurityScopedResource() } }
+        defer { loadedPaths.removeAll(); searches.removeAll() }
+        guard FileManager.default.fileExists(atPath: directory.path) else { return 0 }
+        let files = try FileManager.default.contentsOfDirectory(at: directory,
+            includingPropertiesForKeys: [.isRegularFileKey, .isSymbolicLinkKey], options: [.skipsHiddenFiles])
+        var count = 0
+        for url in files where ["lrc", "lrcx", "txt"].contains(url.pathExtension.lowercased()) {
+            let values = try url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+            guard values.isRegularFile == true, values.isSymbolicLink != true else { continue }
+            do { try moveToTrash(url); count += 1 }
+            catch { throw CacheCleanupFailure(moved: count, reason: error.localizedDescription) }
+        }
+        return count
+    }
+    private struct CacheCleanupFailure: LocalizedError {
+        let moved: Int
+        let reason: String
+        var errorDescription: String? { "已移走 \(moved) 个文件，部分文件未能处理：\(reason)" }
     }
     public func entries() throws -> [Entry] {
         let scoped = directory.startAccessingSecurityScopedResource()

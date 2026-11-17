@@ -114,6 +114,7 @@ struct PreferencesView: View {
     @State private var neteaseLaunchPending = false
     @State private var settingsError: String?
     @State private var showMotionPreview = false
+    @State private var confirmCacheCleanup = false
     @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
 
     init(model: AppModel, initialSection: SettingsSection = .general) {
@@ -197,6 +198,12 @@ struct PreferencesView: View {
                 LyricsPreviewView(preferences: model.preferences)
             }
             .frame(minWidth: 760, minHeight: 500)
+        }
+        .alert("清除歌词缓存？", isPresented: $confirmCacheCleanup) {
+            Button("取消", role: .cancel) {}
+            Button("移到废纸篓", role: .destructive) { model.clearLyricsCache() }
+        } message: {
+            Text("将以下文件夹第一层的 LRC、LRCX 和 TXT 文件移到废纸篓，包含手动导入或放入的同类文件。其他文件、子文件夹和符号链接不处理。\n\n\(model.preferences.directory.path)\n\n当前歌词继续显示。可从废纸篓恢复；自动保存开启时，后续获取的歌词仍会新增缓存。")
         }
         .alert("设置未能保存", isPresented: Binding(get: { settingsError != nil }, set: { if !$0 { settingsError = nil } })) {
             Button("好") { settingsError = nil }
@@ -511,6 +518,19 @@ struct PreferencesView: View {
                 if p.showTranslation { SettingSlider(title: "主窗口翻译字号", detail: "独立调整应用内译文大小。", value: $p.mainTranslationFontSize, range: 11...24) }
             }
 
+            SettingsCard(title: "缓存与资料库") {
+                SettingToggle(title: "自动保存歌词缓存", detail: "将获取的歌词保存到本机，供下次播放和资料库使用。关闭后仍能获取并显示歌词，已有文件继续可用，但不再自动写入歌词或单曲偏移；重新获取歌词需要网络。", value: $p.automaticLyricsCache)
+                SettingRow(title: "清除歌词缓存", detail: "将当前歌词文件夹中的 LRC、LRCX 和 TXT 移到废纸篓；包含手动放入的同类歌词文件。当前歌词继续显示，其他文件保留。", impact: "清理前会确认，可从废纸篓恢复。自动保存开启时，之后仍会新增缓存。") {
+                    Button("清除缓存…") { confirmCacheCleanup = true }.disabled(model.cacheCleanupInProgress)
+                }
+                SettingRow(title: "歌词资料库", detail: "查看现有歌词文件，不另建数据库。关闭自动保存不会删除已有文件。") {
+                    Button("打开资料库") { model.showLibrary = true; model.showMainWindow?() }
+                }
+                if !model.cacheCleanupStatus.isEmpty {
+                    Text(model.cacheCleanupStatus).font(.caption).foregroundStyle(.secondary).padding(14)
+                }
+            }
+
         }
     }
 
@@ -519,7 +539,7 @@ struct PreferencesView: View {
         return Group {
             SettingsCard(title: "同步") {
                 GlobalLyricOffsetSettings(preferences: p)
-                SettingRow(title: "单曲歌词偏移", detail: "在主窗口底部、悬浮窗的“歌词同步”或菜单栏调整；在通用偏移的基础上微调当前歌曲。", impact: "单曲偏移保存到当前歌词文件，重置单曲不会清除通用偏移。") { EmptyView() }
+                SettingRow(title: "单曲歌词偏移", detail: "在主窗口底部、悬浮窗的“歌词同步”或菜单栏调整；在通用偏移的基础上微调当前歌曲。", impact: "自动保存开启时，单曲偏移写入当前歌词文件；关闭时仅本次运行使用。重置单曲不会清除通用偏移。") { EmptyView() }
             }
         }
     }
@@ -638,7 +658,7 @@ struct PreferencesView: View {
                     Text("当前路径").font(.body.weight(.medium))
                     Text(p.directory.path).font(.callout).foregroundStyle(.secondary).textSelection(.enabled).lineLimit(4).truncationMode(.middle)
                 }.padding(14)
-                SettingRow(title: "更换缓存文件夹", detail: "复用已有 LRC / LRCX 文件，新下载默认保存为 LRCX。", impact: "只切换读写位置，不搬迁或删除原文件；空文件夹会重新下载歌词。") {
+                SettingRow(title: "更换缓存文件夹", detail: "复用已有 LRC / LRCX 文件；是否自动写入由“歌词 → 自动保存歌词缓存”控制。", impact: "只切换读写位置，不搬迁或删除原文件；空文件夹会重新下载歌词。") {
                     Button("选择…") { model.chooseCacheDirectory() }
                 }
                 SettingRow(title: "在 Finder 中打开", detail: "查看、备份或手动编辑歌词文件。", impact: "手动删除的文件无法由 LyricsX 自动恢复。") {
@@ -646,7 +666,7 @@ struct PreferencesView: View {
                 }
             }
             SettingsCard(title: "导入与导出") {
-                SettingRow(title: "导入当前歌曲歌词", detail: "为正在播放的歌曲选择 LRC、LRCX 或文本文件。", impact: "应用后会替换这首歌现有的缓存版本。") {
+                SettingRow(title: "导入当前歌曲歌词", detail: "为正在播放的歌曲选择 LRC、LRCX 或文本文件。", impact: "应用于当前歌曲；自动保存开启时会替换现有缓存，关闭时只在本次运行使用。") {
                     Button("导入…") { model.importLyrics() }.disabled(model.session.track == nil)
                 }
                 SettingRow(title: "导出歌词", detail: "保存 LRCX 副本，保留翻译、时间轴和逐字标记。") {

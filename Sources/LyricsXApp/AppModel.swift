@@ -35,6 +35,8 @@ final class AppModel {
     @ObservationIgnored private var artworkThemeTask: Task<Void, Never>?
     var library: [LyricsCache.Entry] = []
     var libraryLoading = false
+    var cacheCleanupInProgress = false
+    var cacheCleanupStatus = ""
     @ObservationIgnored private var libraryGeneration = 0
     @ObservationIgnored private var libraryTask: Task<Void, Never>?
     @ObservationIgnored var showMainWindow: (() -> Void)?
@@ -57,7 +59,7 @@ final class AppModel {
         flexbar = FlexbarController(socketURL: flexbarSocketURL)
         dockVisibility = DockVisibilityController(shouldShow: { preferences.showDockIcon })
         let configurationReader = preferences.sourceConfigurationReader
-        store = LyricsStore(cache: LyricsCache(directory: preferences.directory), configuration: { configurationReader.read() })
+        store = LyricsStore(cache: LyricsCache(directory: preferences.directory), automaticCacheEnabled: { configurationReader.automaticCacheEnabled() }, configuration: { configurationReader.read() })
         session = LyricsSession(repository: repository ?? store)
         bridge.onSnapshot = { [weak self] snapshot in
             guard let self else { return }
@@ -418,6 +420,20 @@ final class AppModel {
         libraryGeneration += 1
         libraryTask?.cancel(); libraryTask = nil
         library = []; libraryLoading = false
+    }
+    func clearLyricsCache() {
+        guard !cacheCleanupInProgress else { return }
+        cacheCleanupInProgress = true
+        cacheCleanupStatus = "正在移到废纸篓…"
+        Task { [weak self, cache = store.cache] in
+            defer { self?.cacheCleanupInProgress = false }
+            do {
+                let count = try await cache.trashLyricsFiles()
+                self?.cacheCleanupStatus = "已将 \(count) 个歌词文件移到废纸篓。"
+            } catch { self?.cacheCleanupStatus = error.localizedDescription }
+            if self?.showLibrary == true { self?.loadLibrary() }
+            else { self?.unloadLibrary() }
+        }
     }
     func chooseCacheDirectory() {
         let panel = NSOpenPanel(); panel.canChooseDirectories = true; panel.canChooseFiles = false

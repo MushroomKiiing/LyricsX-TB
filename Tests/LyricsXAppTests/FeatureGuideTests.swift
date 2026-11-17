@@ -182,7 +182,7 @@ private struct GuideMotionTestHost: View {
 
     @Test func build279IntroducesTouchBarOnceWithoutEnablingItOrChangingExistingSettings() throws {
         let current = ["touchBar43", "backgroundTouchBar43"]
-        #expect(GuideContent.revision == "touch-bar-tb5")
+        #expect(GuideContent.revision == "touch-bar-tb5-cache")
         #expect(GuideContent.release43Pages.map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.42").map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.43").map(\.id) == current)
@@ -209,7 +209,7 @@ private struct GuideMotionTestHost: View {
                 let presented = defaults.stringArray(forKey: "guidePresentedEditions") ?? []
                 history.didPresent()
                 #expect(defaults.stringArray(forKey: "guidePresentedEditions") == presented)
-                #expect(presented.contains("2.0.43:touch-bar-tb5"))
+                #expect(presented.contains("2.0.43:touch-bar-tb5-cache"))
             }
         }
         try fixture { defaults in
@@ -223,7 +223,7 @@ private struct GuideMotionTestHost: View {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let plist = try #require(PropertyListSerialization.propertyList(from: Data(contentsOf: root.appendingPathComponent("Resources/Info.plist")), format: nil) as? [String: Any])
         #expect(plist["CFBundleShortVersionString"] as? String == GuideContent.version)
-        #expect(plist["CFBundleVersion"] as? String == "279.9")
+        #expect(plist["CFBundleVersion"] as? String == "279.10")
         #expect(plist["LyricsXReleaseVersion"] as? String == "2.0.43-TB.5")
         #expect(plist["LSMinimumSystemVersion"] as? String == "26.0")
     }

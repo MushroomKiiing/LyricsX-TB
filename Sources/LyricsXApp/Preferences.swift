@@ -160,6 +160,7 @@ final class Preferences {
         }
     }
     var mainLyricPlacement: MainLyricPlacement { mainLyricPosition.placement(customPercent: mainLyricCustomPercent) }
+    var automaticLyricsCache: Bool { didSet { save("automaticLyricsCache", automaticLyricsCache) } }
     var highResolutionArtwork: Bool { didSet { save("highResolutionArtwork", highResolutionArtwork) } }
     var showTranslation: Bool { didSet { save("showTranslation", showTranslation) } }
     var flexbarEnabled: Bool { didSet { save("flexbarEnabled", flexbarEnabled) } }
@@ -329,6 +330,7 @@ final class Preferences {
         preferBilingual = d.object(forKey: "preferBilingual") as? Bool ?? true
         preferWordTiming = d.object(forKey: "preferWordTiming") as? Bool ?? true
         strictLyricsMatching = d.object(forKey: "strictLyricsMatching") as? Bool ?? true
+        automaticLyricsCache = d.object(forKey: "automaticLyricsCache") as? Bool ?? true
         directory = CacheLocation.resolve(modern: d)
         // Migrate once. Future launches must prefer the user's new setting.
         if d.string(forKey: "overlayAppearance") != overlayAppearance.rawValue {
@@ -402,6 +404,7 @@ final class Preferences {
 final class SourceConfigurationReader: @unchecked Sendable {
     private let defaults: UserDefaults
     init(defaults: UserDefaults) { self.defaults = defaults }
+    func automaticCacheEnabled() -> Bool { defaults.object(forKey: "automaticLyricsCache") as? Bool ?? true }
     func read() -> SourceConfiguration {
         var config = SourceConfiguration()
         let disabled = defaults.stringArray(forKey: "disabledSources") ?? []

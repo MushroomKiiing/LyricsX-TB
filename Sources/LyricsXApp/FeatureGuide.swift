@@ -47,14 +47,14 @@ struct GuidePage: Identifiable {
 
 enum GuideContent {
     // Changed only when the introduction itself is revised, never for a routine rebuild.
-    static let revision = "touch-bar-tb5"
+    static let revision = "touch-bar-tb5-cache"
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.43"
     static let displayVersion = Bundle.main.object(forInfoDictionaryKey: "LyricsXReleaseVersion") as? String ?? version
     static let tutorial: [GuidePage] = [
         .init(id: "start", title: "播放音乐，歌词自动出现", subtitle: "先播放一首歌", symbol: "play.circle", points: [
             "打开 Apple Music、Spotify、网易云或 QQ 音乐播放歌曲，即可自动同步歌词。自动识别不包含浏览器。",
             "没有识别到播放器？前往“设置 → 播放器”选择来源或重新连接。系统询问控制播放器的权限时，请允许。",
-            "应用会自动搜索并保存歌词。等待歌词时显示三个点，纯音乐或没有歌词时显示歌曲信息。"], illustration: "player"),
+            "应用会自动搜索歌词；开启“自动保存歌词缓存”时保存在本机。等待歌词时显示三个点，纯音乐或没有歌词时显示歌曲信息。"], illustration: "player"),
         .init(id: "main", title: "主窗口与菜单栏", subtitle: "播放、切歌和查看歌词", symbol: "text.quote", points: [
             "点击歌词可跳到那一句；底部可以播放、暂停、切歌和拖动进度。在“设置 → 歌词 → 文字”可将主窗口当前歌词设为居中、上方或自定义百分比（5%–95%，越小越靠上），手动滚动后可返回正在唱的地方。",
             "关闭主窗口也能继续看悬浮歌词。菜单栏歌词、Dock 图标和登录启动，可在“设置 → 通用”调整。",
@@ -104,9 +104,9 @@ enum GuideContent {
             "所有歌曲都有同样偏差时，在“设置 → 歌词同步”调整通用偏移，再按歌曲微调。两者相加，分别重置；⌥⌘↑／↓ 仍每次调整单曲 0.2 秒。",
             "歌词版本不对时可重新搜索。菜单栏 → 歌词还可以停用某首歌或整张专辑的搜索，需要时再恢复。"], illustration: "timing"),
         .init(id: "library", title: "使用自己的歌词文件", subtitle: "点击书本图标打开资料库", symbol: "books.vertical", points: [
-            "下载过的歌词会保存在本地，下次播放优先使用。资料库可以查看已有歌词。",
+            "开启“自动保存歌词缓存”时，获取的歌词保存在本地，下次播放优先使用。资料库查看已有文件，不另建数据库。",
             "把 LRC 或 LRCX 文件拖入主窗口，即可替换当前歌词。LRCX 可保留翻译和逐字效果；导出纯文本则不保留时间。",
-            "更换保存位置、导出和写入 Apple Music 等操作在开发者选项中。更换位置不会自动搬移文件；写入 Apple Music 可能覆盖原歌词。"], illustration: "library"),
+            "在“歌词 → 缓存与资料库”可关闭自动保存或将现有歌词移到废纸篓。更换保存位置、导出和写入 Apple Music 等操作在开发者选项中。更换位置不会自动搬移文件；写入 Apple Music 可能覆盖原歌词。"], illustration: "library"),
         .init(id: "flexbar", title: "可选的 Flexbar 歌词", subtitle: "设置 → 开发者选项 → Flexbar", symbol: "rectangle.on.rectangle", points: [
             "需要另行安装并配置 FlexDesigner 歌词插件，然后在开发者选项中开启 Flexbar 连接。普通歌词和悬浮窗不需要此功能。",
             "插件可显示逐字歌词与翻译；这里展示插件渲染器生成的图片，不代表设备上的实际显示帧率或亮度。",
@@ -208,6 +208,7 @@ enum GuideContent {
         .init(id: "backgroundTouchBar43", title: "设置分组与样式入口", subtitle: "TB.5 · 设置 → 外观 / 字体与颜色", symbol: "rectangle.on.rectangle", points: [
             "后台显示无需独立助手。全新安装默认关闭；歌词时钟、暂停、跳转与单曲／通用偏移直接跟随主软件。",
             "悬浮窗的“辅助内容”改为“翻译与下一句”，移到页面上方。选择“仅下一句”或“都不显示”即可隐藏悬浮窗译文。主窗口跟随翻译总开关，Touch Bar 另有开关。",
+            "“歌词 → 缓存与资料库”增加自动保存开关与清除缓存按钮。关闭缓存仍能实时显示歌词；清理先确认，文件移到废纸篓，资料库继续保留。",
             "左侧按常用设置、播放与显示、外观、其他分组。播放器、悬浮窗和 Touch Bar 放在一起；界面主题、悬浮窗材质与透明度集中到新的“外观”页。",
             "字体与颜色页集中说明主窗口与悬浮窗的共用样式，以及 Touch Bar 的固定白色常规字体；Touch Bar 页不再重复该说明。",
             "应用文件、Dock 和界面统一使用 LyricsX TB，保留原音符图标；原项目署名与开源许可保留在“关于”。",
