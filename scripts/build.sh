@@ -57,7 +57,7 @@ cp Resources/run.pl Resources/netease-reader.pl Resources/MediaRemoteAdapter-LIC
 # The dedicated read-only NetEase client reader is loaded by the platform Perl host.
 READER_ARCH_ARGS=()
 for architecture in $REQUESTED_ARCHS; do READER_ARCH_ARGS+=(-arch "$architecture"); done
-clang -dynamiclib -fobjc-arc -fblocks -framework Foundation -mmacosx-version-min=26.0 "${READER_ARCH_ARGS[@]}" \
+clang -dynamiclib -install_name @rpath/libLyricsXNeteaseReader.dylib -fobjc-arc -fblocks -framework Foundation -mmacosx-version-min=26.0 "${READER_ARCH_ARGS[@]}" \
   Resources/NeteaseReader.m -o "$APP/Contents/Frameworks/libLyricsXNeteaseReader.dylib"
 iconutil -c icns Resources/Icon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
 for dylib in "$BIN_DIR"/*.dylib; do
