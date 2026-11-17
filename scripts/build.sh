@@ -55,8 +55,11 @@ lipo -create "${AGENT_SLICES[@]}" -output "$APP/Contents/MacOS/LyricsXNetEaseLau
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp Resources/run.pl Resources/netease-reader.pl Resources/MediaRemoteAdapter-LICENSE Resources/THIRD-PARTY-NOTICES.txt LICENSE "$APP/Contents/Resources/"
 # The dedicated read-only NetEase client reader is loaded by the platform Perl host.
-READER_ARCH_ARGS=()
-for architecture in $REQUESTED_ARCHS; do READER_ARCH_ARGS+=(-arch "$architecture"); done
+READER_ARCH_ARGS=(-arch "$(uname -m)")
+if [[ -n "$REQUESTED_ARCHS" ]]; then
+  READER_ARCH_ARGS=()
+  for architecture in $REQUESTED_ARCHS; do READER_ARCH_ARGS+=(-arch "$architecture"); done
+fi
 clang -dynamiclib -install_name @rpath/libLyricsXNeteaseReader.dylib -fobjc-arc -fblocks -framework Foundation -mmacosx-version-min=26.0 "${READER_ARCH_ARGS[@]}" \
   Resources/NeteaseReader.m -o "$APP/Contents/Frameworks/libLyricsXNeteaseReader.dylib"
 iconutil -c icns Resources/Icon.iconset -o "$APP/Contents/Resources/AppIcon.icns"

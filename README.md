@@ -1,33 +1,46 @@
 # LyricsX TB
 
-面向 MacBook Pro Touch Bar 的非官方歌词定制版，基于 [LyricsX Next](https://github.com/wzk112/LyricsX-Next) 继续开发。与原作者、网易云音乐及 Apple 无隶属或背书关系。
+<img src="Resources/Icon.iconset/icon_128x128.png" width="96" alt="LyricsX 音符图标">
 
-当前预览版：**2.0.43-TB.5-preview.1 / build 279.8**。最低 macOS 26；本次安装包仅 Apple Silicon（arm64）。本机 M1 Touch Bar 已验证基本显示与切换，其他机器及最低系统尚待验证。安装包采用 ad-hoc 签名，未经 Apple 公证。
+基于 [LyricsX Next](https://github.com/wzk112/LyricsX-Next) 的非官方 Touch Bar 定制版，保留原音符图标。
 
-[下载预览版](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5-preview.1) · [功能对比](docs/TB-COMPARISON.md) · [隐私说明](PRIVACY.md) · [许可与署名](COPYRIGHT.md) · [构建说明](docs/BUILD-TB.md)
+[下载 TB.5](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5)
 
-## 功能
+## 相比 LyricsX Next 的改进
 
-- 主程序统一控制后台 Touch Bar 歌词，无需独立助手或聊天软件。
-- 普通模式保留左侧歌词和右侧系统控制条；全宽模式使用可用宽度。轻触歌词或两侧空白返回普通模式，可设置闲置 1–15 秒后恢复全宽。
-- Touch Bar 使用白色常规字体；双语左右分栏，长句分别滚动。译文还受歌词总开关控制。
-- 网易云专用播放状态读取，减少浏览器媒体抢占造成的误判和时间漂移。
-- 可选高清封面匹配、可选随网易云启动，均需主动开启；设置写明各自的数据使用方式。
-- 设置支持本地搜索，按常用设置、播放与显示、外观、其他分组，翻译与字体样式的作用范围明确。
-- 保留上游主窗口、悬浮歌词、歌词搜索与同步等功能；歌词提供商可与当前播放器不同。
+### Touch Bar
 
-## 安装与使用
+- **全宽显示**：增加固定全宽和闲置自动全宽；点歌词或两侧空白切回“左侧歌词＋右侧系统控制条”，等待时间可调 1–15 秒。
+- **后台歌词**：将此前的独立助手整合进主程序，设置开关直接控制实际显示；切换其他应用仍可查看。
+- **文字与翻译**：改为白色常规字体，原文与译文左右并列，长句独立滚动；全宽时利用完整可用区域。
+- **显示稳定性**：修复试验中的黑条、显示区域过窄、空白无法点按和反复切换问题。
 
-退出已有 LyricsX / LyricsX Next / 旧版 Touch Bar 助手，再将下载的 LyricsX TB.app 放入“应用程序”运行。沿用 `com.lyricsx.modern` 标识，因此会继续使用原有设置；请勿与同标识版本同时运行。
+### 网易云与封面
 
-在“设置 → Touch Bar”开启歌词及所需后台/全宽选项，再在网易云播放歌曲。通常无需修改网易云设置。播放器识别失败时先检查“设置 → 播放器”的来源与连接状态；不要为此授予无关的屏幕录制权限。波形等上游可选功能另有其自身权限要求。
+- **播放同步**：增加网易云专用状态读取，减少浏览器媒体源干扰、误报“未播放”和进度漂移；暂停、跳转及歌词偏移跟随主程序。
+- **高清封面**：增加可选的网易云高清封面匹配，不为此建立磁盘图片缓存；设置中说明查询数据与用途。
 
-未公证的预览包可能被 macOS 阻止，请自行核对来源与校验值，并通过系统提供的正常安全确认流程处理；也可以从对应标签自行构建。
+### 启动与隐私
 
-## 开源与来源
+- **随网易云启动**：增加独立开关，与登录启动分别控制；采用本机应用事件监听，不联网、不记录启动历史。
+- **可选功能**：高清封面与随网易云启动均需主动开启，隐私说明统一呈现在对应设置中。
 
-代码按 [MPL-2.0](LICENSE) 分发；依赖遵循各自许可。修改文件的对应源码在本仓库和各发布标签中提供。最初 LyricsX、MxIris 维护分支、LyricsX Next 及依赖作者的权利与署名保留，详见 [COPYRIGHT.md](COPYRIGHT.md) 与 [第三方许可](Resources/THIRD-PARTY-NOTICES.txt)。
+### 设置与界面
 
-基线提交：[`54561db8c06e1abfefbe7aa0f0c2bc26cff94eeb`](https://github.com/wzk112/LyricsX-Next/commit/54561db8c06e1abfefbe7aa0f0c2bc26cff94eeb)，属于上游 2.0.43 开发线，并非声称与 v2.0.43 标签完全相同。保留上游 Git 历史；原 README 另存于 [docs/UPSTREAM-README.md](docs/UPSTREAM-README.md)，其中下载链接和兼容性声明仅指上游。
+- **设置搜索**：增加本地搜索，结果可跳转并定位对应选项。
+- **导航整理**：按常用、播放与显示、外观、其他分组；播放器、悬浮窗与 Touch Bar 放在一起，外观独立成页。
+- **翻译控制**：明确主窗口总开关、悬浮窗“翻译与下一句”五种策略及 Touch Bar 译文开关的实际作用。
+- **字体与颜色**：集中说明主窗口/悬浮窗的共用样式与 Touch Bar 固定白色样式，移除重复条目，栏目使用矢量图标。
+- **文案与命名**：修正未落实或容易误解的说明，统一名称 LyricsX TB，保留原音符图标和上游署名。
 
-本项目不附带商业歌曲音频、个人歌词缓存或用户截图。歌词及译文权利属于各自权利人，软件开源不代表获得这些内容的再分发许可。
+## 使用
+
+下载后将 LyricsX TB.app 放入“应用程序”，退出旧版后打开。在“设置 → Touch Bar”启用所需功能即可。
+
+TB.5 支持 Apple Silicon，最低 macOS 26，尚未经过 Apple 公证。
+
+## 致谢与许可证
+
+基于 [ddddxxx/LyricsX](https://github.com/ddddxxx/LyricsX)、[MxIris 维护分支](https://github.com/MxIris-LyricsX-Project/LyricsX) 和 [wzk112/LyricsX Next](https://github.com/wzk112/LyricsX-Next) 继续开发，保留原项目历史与作者署名。歌词解析和媒体组件基于 LyricsKit 与 mediaremote-adapter，代码沿用 [MPL-2.0](LICENSE)，依赖遵循各自许可。歌词内容版权归其权利人所有。
+
+[完整署名](COPYRIGHT.md) · [隐私说明](PRIVACY.md) · [详细功能对比](docs/TB-COMPARISON.md) · [构建与验证](docs/BUILD-TB.md)

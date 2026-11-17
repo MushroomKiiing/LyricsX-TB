@@ -183,7 +183,3 @@ Legacy/LyricsXPackage     原 LyricsXPackage 项目
 仓库保留了原 LyricsX 的提交历史，因此 GitHub 的 Contributors 列表也包括原项目作者和历史贡献者；该列表不代表本仓库当前的协作者权限。
 
 歌词内容的版权归其权利人所有。
-
-## 本地整合修复
-
-本机 build 279.2 的说明见 [本地修复记录](docs/local-repairs/2026-11-17-touchbar.md)，不代表上游正式发布。
