@@ -2,6 +2,9 @@ import Foundation
 import Darwin
 import LyricsXCore
 
+// Use Darwin's original ABI instead of the recent libswift_errno overlay.
+private var socketErrorNumber: Int32 { Darwin.__error().pointee }
+
 /// Passive, local-only JSONL transport. All mutable state is serialized on MainActor.
 @MainActor final class FlexbarServer {
     enum Failure: Error, LocalizedError {
@@ -66,10 +69,10 @@ import LyricsXCore
         if lstat(directory.path, &info) == 0 {
             guard info.st_uid == getuid(), info.st_mode & S_IFMT == S_IFDIR else { throw Failure.unsafePath }
         } else {
-            guard errno == ENOENT else { throw Failure.system(errno) }
+            guard socketErrorNumber == ENOENT else { throw Failure.system(socketErrorNumber) }
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
         }
-        guard chmod(directory.path, 0o700) == 0 else { throw Failure.system(errno) }
+        guard chmod(directory.path, 0o700) == 0 else { throw Failure.system(socketErrorNumber) }
         address.sun_family = sa_family_t(AF_UNIX)
         address.sun_len = UInt8(MemoryLayout<sockaddr_un>.size)
         withUnsafeMutableBytes(of: &address.sun_path) { buffer in
@@ -78,30 +81,30 @@ import LyricsXCore
         if lstat(path, &info) == 0 {
             guard info.st_uid == getuid(), info.st_mode & S_IFMT == S_IFSOCK else { throw Failure.unsafePath }
             let probe = socket(AF_UNIX, SOCK_STREAM, 0)
-            guard probe >= 0 else { throw Failure.system(errno) }
+            guard probe >= 0 else { throw Failure.system(socketErrorNumber) }
             prepare(probe)
             let result = withUnsafePointer(to: &address) {
                 $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { connect(probe, $0, socklen_t(MemoryLayout<sockaddr_un>.size)) }
             }
-            let code = errno
+            let code = socketErrorNumber
             close(probe)
             guard result < 0, code == ECONNREFUSED else { throw Failure.occupied }
             // Recheck identity before removing only this user's stale socket.
             var current = stat()
             guard lstat(path, &current) == 0, current.st_ino == info.st_ino, current.st_uid == getuid(),
                   current.st_mode & S_IFMT == S_IFSOCK else { throw Failure.unsafePath }
-            guard unlink(path) == 0 else { throw Failure.system(errno) }
-        } else if errno != ENOENT { throw Failure.system(errno) }
+            guard unlink(path) == 0 else { throw Failure.system(socketErrorNumber) }
+        } else if socketErrorNumber != ENOENT { throw Failure.system(socketErrorNumber) }
         let fd = socket(AF_UNIX, SOCK_STREAM, 0)
-        guard fd >= 0 else { throw Failure.system(errno) }
+        guard fd >= 0 else { throw Failure.system(socketErrorNumber) }
         let result = withUnsafePointer(to: &address) {
             $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_un>.size)) }
         }
-        guard result == 0 else { let code = errno; close(fd); throw Failure.system(code) }
-        guard lstat(path, &info) == 0 else { close(fd); throw Failure.system(errno) }
+        guard result == 0 else { let code = socketErrorNumber; close(fd); throw Failure.system(code) }
+        guard lstat(path, &info) == 0 else { close(fd); throw Failure.system(socketErrorNumber) }
         ownedInode = info.st_ino
         guard chmod(path, 0o600) == 0, listen(fd, Int32(Self.maximumConnections)) == 0 else {
-            let code = errno; close(fd); removeOwnedSocket(); throw Failure.system(code)
+            let code = socketErrorNumber; close(fd); removeOwnedSocket(); throw Failure.system(code)
         }
         prepare(fd)
         listener = fd
@@ -179,7 +182,7 @@ import LyricsXCore
         var bytes = [UInt8](repeating: 0, count: 8192)
         while true {
             let count = read(fd, &bytes, bytes.count)
-            if count < 0 { if errno == EINTR { continue }; if errno == EAGAIN || errno == EWOULDBLOCK { return }; disconnect(fd); return }
+            if count < 0 { if socketErrorNumber == EINTR { continue }; if socketErrorNumber == EAGAIN || socketErrorNumber == EWOULDBLOCK { return }; disconnect(fd); return }
             if count == 0 { disconnect(fd); return }
             client.input.append(contentsOf: bytes.prefix(count))
             while let end = client.input.firstIndex(of: 10) {
@@ -230,8 +233,8 @@ import LyricsXCore
                 write(client.fd, buffer.baseAddress!.advanced(by: client.offset), output.count - client.offset)
             }
             if count < 0 {
-                if errno == EAGAIN || errno == EWOULDBLOCK { watchWritable(client); return }
-                if errno == EINTR { continue }
+                if socketErrorNumber == EAGAIN || socketErrorNumber == EWOULDBLOCK { watchWritable(client); return }
+                if socketErrorNumber == EINTR { continue }
                 disconnect(client.fd); return
             }
             guard count > 0 else { disconnect(client.fd); return }

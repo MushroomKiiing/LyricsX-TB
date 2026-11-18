@@ -58,7 +58,7 @@ for architecture in $AGENT_ARCHS; do
 done
 lipo -create "${AGENT_SLICES[@]}" -output "$APP/Contents/MacOS/LyricsXNetEaseLaunchAgent"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
-cp Resources/run.pl Resources/netease-reader.pl Resources/MediaRemoteAdapter-LICENSE Resources/THIRD-PARTY-NOTICES.txt LICENSE "$APP/Contents/Resources/"
+cp Resources/run.pl Resources/netease-reader.pl Resources/MediaRemoteAdapter-LICENSE Resources/THIRD-PARTY-NOTICES.txt ../LICENSE "$APP/Contents/Resources/"
 # The dedicated read-only NetEase client reader is loaded by the platform Perl host.
 READER_ARCH_ARGS=(-arch "$(uname -m)")
 if [[ -n "$REQUESTED_ARCHS" ]]; then

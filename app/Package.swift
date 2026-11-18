@@ -10,6 +10,8 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "Vendor/LyricsKit"),
+        // Avoid pulling newer Span-based collections into the Sequoia binary.
+        .package(url: "https://github.com/apple/swift-collections.git", exact: "1.2.1"),
         .package(url: "https://github.com/MxIris-LyricsX-Project/mediaremote-adapter", revision: "0fa7db9dea7cdb72bbb4090eaccf2355d8e4279e"),
     ],
     targets: [

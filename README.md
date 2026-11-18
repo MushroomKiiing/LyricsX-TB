@@ -2,15 +2,16 @@
 
 **简体中文** · [English](docs/README.en.md)
 
-<img src="Resources/Icon.iconset/icon_128x128.png" width="96" alt="LyricsX 音符图标">
+<img src="app/Resources/Icon.iconset/icon_128x128.png" width="96" alt="LyricsX 音符图标">
 
 基于 [LyricsX Next](https://github.com/wzk112/LyricsX-Next) 的非官方 Touch Bar 定制版。
 
-**[下载 TB.6 兼容试用版](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.2/LyricsX-TB-2.0.43-tb.6-preview.2-universal.zip)** · macOS 15 或更新版本 · Apple 芯片（含 M1）和 Intel。
+## 下载
 
-[TB.5.1 正式版](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5.1) · macOS 26 或更新版本 · 仅 Apple 芯片。
+- **[直接下载正式版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.1/LyricsX-TB-2.0.43-tb.5.1-arm64.zip)**：macOS 26+，Apple 芯片。
+- **[直接下载兼容版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.2/LyricsX-TB-2.0.43-tb.6-preview.2-universal.zip)**：macOS 15+，Apple 芯片（含 M1）和 Intel。仍在试用，macOS 15 实体 Touch Bar 待验证。
 
-[历史版本](docs/releases/HISTORY.md)
+[安装与排查](DOWNLOAD.md) · [历史版本](docs/releases/HISTORY.md)
 
 ## 相比 LyricsX Next 的改进
 
@@ -30,4 +31,4 @@ TB.6 的 macOS 15 实体 Touch Bar 待验证。安装包尚未经过 Apple 公�
 
 基于 [ddddxxx/LyricsX](https://github.com/ddddxxx/LyricsX)、[MxIris 维护分支](https://github.com/MxIris-LyricsX-Project/LyricsX) 和 [wzk112/LyricsX Next](https://github.com/wzk112/LyricsX-Next) 继续开发，保留原项目历史与作者署名。歌词解析和媒体组件基于 LyricsKit 与 mediaremote-adapter，代码沿用 [MPL-2.0](LICENSE)，依赖遵循各自许可。歌词内容版权归其权利人所有。
 
-[完整署名](COPYRIGHT.md) · [隐私说明](PRIVACY.md) · [详细功能对比](docs/TB-COMPARISON.md) · [构建与验证](docs/BUILD-TB.md)
+[完整署名](docs/COPYRIGHT.md) · [隐私说明](docs/PRIVACY.md) · [详细功能对比](docs/TB-COMPARISON.md) · [构建与验证](docs/BUILD-TB.md)

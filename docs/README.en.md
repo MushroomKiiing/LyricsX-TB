@@ -6,9 +6,9 @@ An unofficial Touch Bar edition based on [LyricsX Next](https://github.com/wzk11
 
 **[Download TB.6 compatibility preview](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.2/LyricsX-TB-2.0.43-tb.6-preview.2-universal.zip)** — macOS 15 or later · Apple silicon (including M1) and Intel.
 
-[TB.5.1 stable](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5.1) — macOS 26 or later · Apple silicon only.
+[Direct download: TB.5.1 stable ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.1/LyricsX-TB-2.0.43-tb.5.1-arm64.zip) — macOS 26 or later · Apple silicon only.
 
-[Older releases](releases/HISTORY.md)
+[Installation and troubleshooting](../DOWNLOAD.md) · [Older releases](releases/HISTORY.md)
 
 ## Improvements over LyricsX Next
 
@@ -28,4 +28,4 @@ The compatibility preview has not been tested on a physical Mac running macOS 15
 
 Based on [ddddxxx/LyricsX](https://github.com/ddddxxx/LyricsX), the [MxIris maintenance branch](https://github.com/MxIris-LyricsX-Project/LyricsX), and [wzk112/LyricsX Next](https://github.com/wzk112/LyricsX-Next). Code remains under [MPL-2.0](../LICENSE); dependencies retain their own licenses. Lyrics belong to their respective rights holders.
 
-[Full credits](../COPYRIGHT.md) · [Privacy](../PRIVACY.md) · [Detailed comparison](TB-COMPARISON.md) · [Build instructions](BUILD-TB.md)
+[Full credits](COPYRIGHT.md) · [Privacy](PRIVACY.md) · [Detailed comparison](TB-COMPARISON.md) · [Build instructions](BUILD-TB.md)

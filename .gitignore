@@ -14,10 +14,10 @@ swift-syntax/.swiftpm
 *.app/
 
 # Flexbar local runtimes and generated review artifacts
-Integrations/Flexbar/node_modules/
-Integrations/Flexbar/qa-output/
-com.wzk112.lyricsxnext.plugin/backend/node_modules/
-com.wzk112.lyricsxnext.plugin/logs/
+app/Integrations/Flexbar/node_modules/
+app/Integrations/Flexbar/qa-output/
+app/com.wzk112.lyricsxnext.plugin/backend/node_modules/
+app/com.wzk112.lyricsxnext.plugin/logs/
 com.wzk112.lyricsxnext.flexplugin
 
 # Local-only QA and private configuration

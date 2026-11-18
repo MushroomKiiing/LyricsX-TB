@@ -47,7 +47,7 @@ struct GuidePage: Identifiable {
 
 enum GuideContent {
     // Changed only when the introduction itself is revised, never for a routine rebuild.
-    static let revision = "touch-bar-tb6-interleaved-translation"
+    static let revision = "touch-bar-tb6-launch-fix"
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.43"
     static let displayVersion = Bundle.main.object(forInfoDictionaryKey: "LyricsXReleaseVersion") as? String ?? version
     static let tutorial: [GuidePage] = [
@@ -211,7 +211,7 @@ enum GuideContent {
             "“歌词 → 缓存与资料库”增加自动保存开关与清除缓存按钮。关闭缓存仍能实时显示歌词；清理先确认，文件移到废纸篓，资料库继续保留。",
             "左侧按常用设置、播放与显示、外观、其他分组。播放器、悬浮窗和 Touch Bar 放在一起；界面主题、悬浮窗材质与透明度集中到新的“外观”页。",
             "字体与颜色页集中说明主窗口与悬浮窗的共用样式，以及 Touch Bar 的固定白色常规字体；Touch Bar 页不再重复该说明。",
-            "TB.6 适用于 macOS 15 Sequoia 和更新系统，同一安装包支持 Intel 和 Apple 芯片。macOS 15 的桌面悬浮窗使用系统磨砂材质；实时波形和 HDR 辉光增强需要 macOS 26。",
+            "TB.6 支持 macOS 15 Sequoia 和更新系统，修复部分 Mac 打开时可能因缺少运行库而立即退出的问题。安装包包含 Intel 和 Apple 芯片。macOS 15 的桌面悬浮窗使用系统磨砂材质；实时波形和 HDR 辉光增强需要 macOS 26。",
             "“通用 → 随网易云启动”默认关闭，启用后使用轻量后台监听器，打开网易云时自动运行歌词软件；不联网、不保存记录，可随时关闭。全宽等待时间现在可选 1–15 秒。",
             "字体与颜色只影响主窗口和悬浮窗；Touch Bar 保持白色常规字体。部分播放器只提供 100 像素缩略图。“播放器 → 补充高清封面”可按当前歌曲、歌手、专辑及时长向网易云匹配高清图；默认关闭，匹配不到时保留原封面。"], illustration: "touchBar43")
     ]

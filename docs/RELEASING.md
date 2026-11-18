@@ -1,6 +1,6 @@
 # LyricsX Next release process
 
-This checklist applies to every public version. The release tag and GitHub asset must correspond to the exact tested source commit.
+Run the build and test commands from `app/` on the current default branch. Historical release tags use their original layout. This checklist applies to every public version. The release tag and GitHub asset must correspond to the exact tested source commit.
 
 1. Confirm the current GitHub latest release, branch, worktree status, and intended version/build number. Review all tracked and untracked changes; include every source and test file needed by the app and exclude local dependencies, QA output, and backups.
 2. Complete the release gate: `swift test --no-parallel`, targeted native UI and audio lifecycle tests, `git diff --check`, and Flexbar `npm test`/`npm run validate` if its integration changed. Inspect actual app windows and changed user flows. Fix release blocking findings before proceeding.

@@ -22,7 +22,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/ddddxxx/Regex", from: "1.0.1"),
         .package(url: "https://github.com/MxIris-Library-Forks/SwiftCF", from: "0.2.2"),
-        .package(url: "https://github.com/apple/swift-async-algorithms", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-async-algorithms", exact: "1.0.4"),
         .package(url: "https://github.com/attaswift/BigInt", from: "5.6.0"),
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift", from: "1.9.0"),
     ],

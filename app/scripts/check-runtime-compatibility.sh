@@ -1,7 +1,7 @@
 #!/bin/bash
 # Regression guard for #10. SDK availability annotations did not prevent this
 # missing-symbol crash; inspect linked imports, including bundled helpers.
-# This is a known-symbol check, not a replacement for running on macOS 26.0.
+# Check known startup hazards and missing bundled libraries. This does not replace an old-OS launch test.
 set -euo pipefail
 if [[ $# -ne 1 || ! -e "$1" ]]; then
   echo "Usage: scripts/check-runtime-compatibility.sh <app-bundle-or-Mach-O>" >&2
@@ -9,8 +9,10 @@ if [[ $# -ne 1 || ! -e "$1" ]]; then
 fi
 checked=0
 failed=0
+bundle=""
+[[ ! -d "$1" ]] || bundle="$1"
 check_binary() {
-  local binary="$1" description imports
+  local binary="$1" description imports links line path suffix
   description="$(/usr/bin/file -b "$binary")"
   [[ "$description" == *Mach-O* ]] || return 0
   checked=$((checked + 1))
@@ -19,6 +21,29 @@ check_binary() {
     failed=1
     return
   fi
+  if ! links="$(/usr/bin/otool -arch all -L "$binary")"; then
+    echo "Cannot inspect load commands: $binary" >&2
+    failed=1
+    return
+  fi
+  while IFS= read -r line; do
+    [[ "$line" == $'\t'* ]] || continue
+    path="${line#$'\t'}"
+    path="${path%% (compatibility version*}"
+    case "$path" in
+      */libswift_errno.dylib)
+        echo "Incompatible runtime dependency: $path in $binary (macOS 15)." >&2
+        failed=1
+        ;;
+      @rpath/*)
+        suffix="${path#@rpath/}"
+        if [[ -n "$bundle" && ! -f "$bundle/Contents/Frameworks/$suffix" ]]; then
+          echo "Missing bundled runtime dependency: $path in $binary." >&2
+          failed=1
+        fi
+        ;;
+    esac
+  done <<< "$links"
   # Match getter/addressor variants and weak imports too. Merely guarding a
   # call with #available cannot be trusted when the SDK annotation is wrong.
   if [[ "$imports" == *'_$s2os6LoggerV8disabled'* ]]; then
@@ -42,4 +67,4 @@ if [[ "$checked" -eq 0 ]]; then
   exit 1
 fi
 [[ "$failed" -eq 0 ]] || exit 1
-echo "Runtime compatibility guard passed for $checked Mach-O binaries (issue #10)."
+echo "Runtime compatibility guard passed for $checked Mach-O binaries (known runtime and bundled dependency checks)."

@@ -29,4 +29,20 @@ cp "$WORK/bad.dylib" "$WORK/Test App.app/Contents/Frameworks/Nested Library.dyli
 expect_rejection "$WORK/Test App.app" 'Nested Library.dylib'
 expect_rejection "$WORK/clean.c" 'No Mach-O'
 expect_rejection "$WORK/missing.app" 'Usage:'
-echo "Runtime compatibility guard regression tests passed (6 checks)."
+rm "$WORK/Test App.app/Contents/Frameworks/Nested Library.dylib"
+cat > "$WORK/runtime.c" <<'C'
+int fixture_runtime(void) { return 0; }
+C
+cat > "$WORK/linked.c" <<'C'
+extern int fixture_runtime(void);
+int main(void) { return fixture_runtime(); }
+C
+xcrun clang -dynamiclib -install_name @rpath/libExampleRuntime.dylib "$WORK/runtime.c" -o "$WORK/libExampleRuntime.dylib"
+xcrun clang "$WORK/linked.c" -L"$WORK" -lExampleRuntime -o "$WORK/Test App.app/Contents/MacOS/App"
+expect_rejection "$WORK/Test App.app" 'Missing bundled runtime dependency'
+cp "$WORK/libExampleRuntime.dylib" "$WORK/Test App.app/Contents/Frameworks/"
+bash "$CHECK" "$WORK/Test App.app"
+xcrun clang -dynamiclib -install_name /usr/lib/swift/libswift_errno.dylib "$WORK/runtime.c" -o "$WORK/libswift_errno.dylib"
+xcrun clang "$WORK/linked.c" -L"$WORK" -lswift_errno -o "$WORK/Test App.app/Contents/MacOS/App"
+expect_rejection "$WORK/Test App.app" 'Incompatible runtime dependency: /usr/lib/swift/libswift_errno.dylib'
+echo "Runtime compatibility guard regression tests passed (9 checks)."

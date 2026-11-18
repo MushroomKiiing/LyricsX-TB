@@ -47,4 +47,4 @@ Only alive keys are consumers. Dead keys, disconnected devices and host connecti
 
 应用已安装到 `/Applications/LyricsX Next.app`，插件 0.2.0 已通过官方 CLI 更新到真实 FlexDesigner。普通歌词配置面板已验证加载。未代用户保存或上传正在编辑的 profile。整屏触摸、USB 刷新延迟与可持续帧率仍需要物理设备验收。UI同时提供官方示例使用的后缀文件名及文档使用的完整cid文件名。
 
-Native protocol/renderer gate evidence: [validation record](../../docs/Flexbar-Validation.md).
+Native protocol/renderer gate evidence: [validation record](../../../docs/Flexbar-Validation.md).
