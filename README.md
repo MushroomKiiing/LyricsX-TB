@@ -4,7 +4,7 @@
 
 基于 [LyricsX Next](https://github.com/wzk112/LyricsX-Next) 的非官方 Touch Bar 定制版，保留原音符图标。
 
-[下载 TB.5](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5)
+[下载 TB.5.1](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5.1)
 
 ## 相比 LyricsX Next 的改进
 
@@ -42,7 +42,7 @@
 
 下载后将 LyricsX TB.app 放入“应用程序”，退出旧版后打开。在“设置 → Touch Bar”启用所需功能即可。
 
-TB.5 支持 Apple Silicon，最低 macOS 26，尚未经过 Apple 公证。
+TB.5.1 支持 Apple Silicon，最低 macOS 26，尚未经过 Apple 公证。
 
 ## 致谢与许可证
 

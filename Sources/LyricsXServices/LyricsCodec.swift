@@ -55,6 +55,8 @@ public enum LyricsCodec {
             }
         if let rich {
             rows = rich.lines
+        } else if [source, lyrics.metadata.service, lyrics.idTags[.lrcBy]].contains(where: { $0?.lowercased() == "kugou" }) {
+            rows = InterleavedKugouTranslation.normalize(rows)
         }
         return LyricsDocument(title: lyrics.idTags[.title] ?? "", artist: lyrics.idTags[.artist] ?? "",
                               album: lyrics.idTags[.album] ?? "", source: AppleMusicCloudLyricsSource.normalizedName(rich?.source ?? source ?? lyrics.metadata.service ?? "未知来源"),

@@ -47,7 +47,7 @@ struct GuidePage: Identifiable {
 
 enum GuideContent {
     // Changed only when the introduction itself is revised, never for a routine rebuild.
-    static let revision = "touch-bar-tb5-cache"
+    static let revision = "touch-bar-tb51-interleaved-translation"
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.43"
     static let displayVersion = Bundle.main.object(forInfoDictionaryKey: "LyricsXReleaseVersion") as? String ?? version
     static let tutorial: [GuidePage] = [
@@ -204,7 +204,7 @@ enum GuideContent {
         .init(id: "touchBar43", title: "Touch Bar 已统一到主软件设置", subtitle: "TB.5 · 设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
             "Touch Bar 歌词、后台显示、固定全宽、闲置后自动全宽与翻译都由这里实时控制。全新安装默认关闭；已有本地助手设置会一次性导入。",
             "全宽歌词使用整条可用区域。点按歌词或两侧空白，切回左侧歌词与右侧系统控制条；可设置 1–15 秒后恢复全宽。",
-            "歌词保留 15 pt 白色常规字体。翻译原文在左、译文在右；受“歌词”页翻译总开关控制，无译文时原文居中。"], illustration: "touchBar43"),
+            "修复部分酷狗歌词把译文当成下一句的问题。原文在左、译文在右；关闭翻译后只看原文。原字体与显示模式保持不变。"], illustration: "touchBar43"),
         .init(id: "backgroundTouchBar43", title: "设置分组与样式入口", subtitle: "TB.5 · 设置 → 外观 / 字体与颜色", symbol: "rectangle.on.rectangle", points: [
             "后台显示无需独立助手。全新安装默认关闭；歌词时钟、暂停、跳转与单曲／通用偏移直接跟随主软件。",
             "悬浮窗的“辅助内容”改为“翻译与下一句”，移到页面上方。选择“仅下一句”或“都不显示”即可隐藏悬浮窗译文。主窗口跟随翻译总开关，Touch Bar 另有开关。",
