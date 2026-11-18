@@ -238,8 +238,8 @@ struct PreferencesView: View {
         case (.lyrics, "主窗口翻译字号") where !p.showTranslation: return "显示翻译"
         case (.overlay, "翻译字号") where !p.showTranslation || !p.overlaySecondaryMode.supportsTranslation,
              (.overlay, "下一句字号") where !p.overlaySecondaryMode.supportsNext: return "翻译与下一句"
-        case (.overlay, "波形颜色") where !p.overlayWaveformEnabled,
-             (.overlay, "音频采集") where !p.overlayWaveformEnabled:
+        case (.overlay, "波形颜色") where !p.effectiveOverlayWaveformEnabled,
+             (.overlay, "音频采集") where !p.effectiveOverlayWaveformEnabled:
             return "显示实时波形"
         case (.appearance, "底色透明度"), (.appearance, "透明度"):
             return p.overlayAppearance == .glass ? "底色透明度" : "透明度"

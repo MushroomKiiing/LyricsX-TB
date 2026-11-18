@@ -6,9 +6,11 @@
 
 基于 [LyricsX Next](https://github.com/wzk112/LyricsX-Next) 的非官方 Touch Bar 定制版。
 
-**[下载 TB.6 兼容试用版](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.1/LyricsX-TB-2.0.43-tb.6-preview.1-universal.zip)** · macOS 15 或更新版本 · Apple 芯片（含 M1）和 Intel。
+**[下载 TB.6 兼容试用版](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.2/LyricsX-TB-2.0.43-tb.6-preview.2-universal.zip)** · macOS 15 或更新版本 · Apple 芯片（含 M1）和 Intel。
 
-[TB.5 正式版](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5) · macOS 26 或更新版本 · 仅 Apple 芯片。
+[TB.5.1 正式版](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5.1) · macOS 26 或更新版本 · 仅 Apple 芯片。
+
+[历史版本](docs/releases/HISTORY.md)
 
 ## 相比 LyricsX Next 的改进
 

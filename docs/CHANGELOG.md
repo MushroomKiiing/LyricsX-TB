@@ -1,3 +1,7 @@
+# LyricsX TB 2.0.43-TB.6-preview.2（279.12，本地修复）
+
+修复部分酷狗逐字文件把译文当成独立歌词行，导致 Touch Bar 交替显示或无法隐藏译文。缓存按原样保留，读取时恢复左右配对。
+
 # LyricsX TB 2.0.43-TB.6-preview.1（279.11）
 
 新增 macOS 15 Sequoia 支持，安装包同时包含 Apple 芯片与 Intel。旧系统使用磨砂悬浮窗和普通亮度辉光；实时波形需要 macOS 26。

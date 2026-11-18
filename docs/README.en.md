@@ -4,9 +4,11 @@
 
 An unofficial Touch Bar edition based on [LyricsX Next](https://github.com/wzk112/LyricsX-Next).
 
-**[Download TB.6 compatibility preview](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.1/LyricsX-TB-2.0.43-tb.6-preview.1-universal.zip)** — macOS 15 or later · Apple silicon (including M1) and Intel.
+**[Download TB.6 compatibility preview](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.2/LyricsX-TB-2.0.43-tb.6-preview.2-universal.zip)** — macOS 15 or later · Apple silicon (including M1) and Intel.
 
-[TB.5 stable](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5) — macOS 26 or later · Apple silicon only.
+[TB.5.1 stable](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5.1) — macOS 26 or later · Apple silicon only.
+
+[Older releases](releases/HISTORY.md)
 
 ## Improvements over LyricsX Next
 
