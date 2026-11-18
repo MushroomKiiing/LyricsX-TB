@@ -47,7 +47,7 @@ struct GuidePage: Identifiable {
 
 enum GuideContent {
     // Changed only when the introduction itself is revised, never for a routine rebuild.
-    static let revision = "touch-bar-tb5-cache"
+    static let revision = "touch-bar-tb6-sequoia"
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.43"
     static let displayVersion = Bundle.main.object(forInfoDictionaryKey: "LyricsXReleaseVersion") as? String ?? version
     static let tutorial: [GuidePage] = [
@@ -68,7 +68,7 @@ enum GuideContent {
             "解锁后拖动窗口，锁定后避免误拖。“点击穿透”让你直接操作后面的应用，并自动锁定位置。",
             "锁定时可开启“鼠标经过时隐藏”，离开后恢复。也可以选择暂停播放时隐藏。"], illustration: "overlay"),
         .init(id: "waveform", title: "可选的悬浮窗音频波形", subtitle: "设置 → 悬浮窗", symbol: "waveform", points: [
-            "实时波形默认关闭。开启后可选择白色或封面彩色，波形沿悬浮窗底部显示。",
+            "实时波形需要 macOS 26 或更新版本，默认关闭。开启后可选择白色或封面彩色，波形沿悬浮窗底部显示。",
             "首次开启可能需要 macOS 系统音频录制权限。仅尝试读取当前识别播放器的音频；暂停、隐藏和减少动态效果时停止。",
             "这里显示固定的示意帧，打开指南不会读取音频。权限或音频不可用时，可在设置中查看状态并重试。"], illustration: "releaseWaveform38"),
         .init(id: "style", title: "选择喜欢的背景", subtitle: "设置 → 外观，两种材质实时预览", symbol: "square.on.square", points: [
@@ -201,17 +201,17 @@ enum GuideContent {
             "改善部分 QQ 音乐歌词的读取、搜索与封面显示；修复缓存文件变化及异常设置值引起的显示问题。"], illustration: "conversion"))
     ]
     static let release43Pages: [GuidePage] = [
-        .init(id: "touchBar43", title: "Touch Bar 已统一到主软件设置", subtitle: "TB.5 · 设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
+        .init(id: "touchBar43", title: "Touch Bar 已统一到主软件设置", subtitle: "TB.6 · 设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
             "Touch Bar 歌词、后台显示、固定全宽、闲置后自动全宽与翻译都由这里实时控制。全新安装默认关闭；已有本地助手设置会一次性导入。",
             "全宽歌词使用整条可用区域。点按歌词或两侧空白，切回左侧歌词与右侧系统控制条；可设置 1–15 秒后恢复全宽。",
             "歌词保留 15 pt 白色常规字体。翻译原文在左、译文在右；受“歌词”页翻译总开关控制，无译文时原文居中。"], illustration: "touchBar43"),
-        .init(id: "backgroundTouchBar43", title: "设置分组与样式入口", subtitle: "TB.5 · 设置 → 外观 / 字体与颜色", symbol: "rectangle.on.rectangle", points: [
+        .init(id: "backgroundTouchBar43", title: "设置分组与样式入口", subtitle: "TB.6 · 设置 → 外观 / 字体与颜色", symbol: "rectangle.on.rectangle", points: [
             "后台显示无需独立助手。全新安装默认关闭；歌词时钟、暂停、跳转与单曲／通用偏移直接跟随主软件。",
             "悬浮窗的“辅助内容”改为“翻译与下一句”，移到页面上方。选择“仅下一句”或“都不显示”即可隐藏悬浮窗译文。主窗口跟随翻译总开关，Touch Bar 另有开关。",
             "“歌词 → 缓存与资料库”增加自动保存开关与清除缓存按钮。关闭缓存仍能实时显示歌词；清理先确认，文件移到废纸篓，资料库继续保留。",
             "左侧按常用设置、播放与显示、外观、其他分组。播放器、悬浮窗和 Touch Bar 放在一起；界面主题、悬浮窗材质与透明度集中到新的“外观”页。",
             "字体与颜色页集中说明主窗口与悬浮窗的共用样式，以及 Touch Bar 的固定白色常规字体；Touch Bar 页不再重复该说明。",
-            "应用文件、Dock 和界面统一使用 LyricsX TB，保留原音符图标；原项目署名与开源许可保留在“关于”。",
+            "TB.6 适用于 macOS 15 Sequoia 和更新系统，同一安装包支持 Intel 和 Apple 芯片。macOS 15 的桌面悬浮窗使用系统磨砂材质；实时波形和 HDR 辉光增强需要 macOS 26。",
             "“通用 → 随网易云启动”默认关闭，启用后使用轻量后台监听器，打开网易云时自动运行歌词软件；不联网、不保存记录，可随时关闭。全宽等待时间现在可选 1–15 秒。",
             "字体与颜色只影响主窗口和悬浮窗；Touch Bar 保持白色常规字体。部分播放器只提供 100 像素缩略图。“播放器 → 补充高清封面”可按当前歌曲、歌手、专辑及时长向网易云匹配高清图；默认关闭，匹配不到时保留原封面。"], illustration: "touchBar43")
     ]
@@ -538,11 +538,12 @@ private struct GuideQuickSettings: View {
         switch page {
         case "waveform", "waveform38", "waveform41":
             SettingToggle(title: "显示实时波形", detail: "开启后才尝试采集当前播放器音频，首次可能请求 macOS 系统音频录制权限。", value: $preferences.overlayWaveformEnabled)
+                .disabled(!PlayerAudioWaveformTap.isSupported)
             SettingRow(title: "波形颜色", detail: "白色或封面多色渐变，沿悬浮窗底部显示。") {
                 Picker("波形颜色", selection: $preferences.overlayWaveformStyle) {
                     ForEach(OverlayWaveformStyle.allCases) { Text($0.title).tag($0) }
                 }.labelsHidden().frame(width: 140)
-            }.disabled(!preferences.overlayWaveformEnabled)
+            }.disabled(!preferences.effectiveOverlayWaveformEnabled)
             if !preferences.overlayWaveformStatus.isEmpty {
                 SettingRow(title: "音频采集", detail: preferences.overlayWaveformStatus) {
                     Button("重试") { model?.overlay?.retryWaveform() }.disabled(model == nil)

@@ -27,6 +27,7 @@ import LyricsXCore
             samples.record()
         }
     }
+    @available(macOS 26, *)
     @Test(arguments: [false, true]) func nativeGlassTextDrawCadence(dark: Bool) async throws {
         _ = NSApplication.shared; NSApp.finishLaunching()
         let samples = Samples()

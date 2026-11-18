@@ -24,6 +24,7 @@ import QuartzCore
     }
 
     func update(headroom: Double, visible: Bool, redraw: Bool = false) {
+        guard #available(macOS 26, *) else { return }
         let target = visible && headroom.isFinite ? max(1, headroom) : 1
         guard target != requestedHeadroom || (target > 1 && (redraw || !hasPresented)) else { return }
         requestedHeadroom = target

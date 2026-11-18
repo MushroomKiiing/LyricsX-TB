@@ -128,7 +128,7 @@ final class OverlayViewport {
             primarySpacing: p.overlayPrimarySpacing, secondarySpacing: p.overlaySecondarySpacing)
     }
     static func height(document: LyricsDocument, index: Int, preferences p: Preferences, maximumWidth: Double) -> Double {
-        let chrome = p.overlayWaveformEnabled ? OverlayLayoutMetrics.chromeHeight
+        let chrome = p.effectiveOverlayWaveformEnabled ? OverlayLayoutMetrics.chromeHeight
             : OverlayLyricsWindowLayout.centeredChromeHeight
         return chrome + visibleHeight(document: document, index: index,
             preferences: p, maximumWidth: maximumWidth)
@@ -143,7 +143,7 @@ final class OverlayViewport {
     static let originalChromeHeight = 104.0
     static func bottomTrim(document: LyricsDocument?, index: Int?, preferences p: Preferences,
                            maximumWidth: Double) -> Double {
-        guard !p.overlayWaveformEnabled, let document, let index else { return 0 }
+        guard !p.effectiveOverlayWaveformEnabled, let document, let index else { return 0 }
         let visible = OverlayTextMeasure.visibleHeight(document: document, index: index,
             preferences: p, maximumWidth: maximumWidth)
         let height = baseHeight(document: document, index: index, preferences: p,
@@ -156,7 +156,7 @@ final class OverlayViewport {
         let normal = p.overlayAdaptiveSize
             ? OverlayTextMeasure.height(document: document, index: index, preferences: p, maximumWidth: maximumWidth)
             : OverlayLayoutMetrics.height(preferences: p)
-        guard !p.overlayWaveformEnabled else { return normal }
+        guard !p.effectiveOverlayWaveformEnabled else { return normal }
         let visible = OverlayTextMeasure.visibleHeight(document: document, index: index,
             preferences: p, maximumWidth: maximumWidth)
         return max(normal, visible + centeredChromeHeight)

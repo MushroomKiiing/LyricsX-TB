@@ -19,6 +19,7 @@ import LyricsXCore
         func lyrics(for track: Track, forceRefresh: Bool) -> AsyncThrowingStream<LyricCandidate, Error> { .init { $0.finish() } }
         func save(_ document: LyricsDocument, for track: Track) async throws {}
     }
+    @available(macOS 26, *)
     @Test func clearGlassExpandsAndContractsThroughVisibleIntermediateHeights() async throws {
         _ = NSApplication.shared
         let delegate = Delegate(), previous = NSApp.delegate

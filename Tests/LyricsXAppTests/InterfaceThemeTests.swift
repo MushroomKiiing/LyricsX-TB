@@ -40,6 +40,7 @@ import LyricsXCore
         #expect(controller.panel.appearance == nil)
     }
 
+    @available(macOS 26, *)
     @Test func nativeMaterialAndInkAgreeForBothThemesAndStyles() throws {
         let suite = "LyricsXThemeTest-" + UUID().uuidString
         let defaults = try #require(UserDefaults(suiteName: suite))
@@ -60,6 +61,7 @@ import LyricsXCore
         }
     }
 
+    @available(macOS 26, *)
     @Test func enablingReducedMotionFinishesAppearanceWithoutReplacingGlass() throws {
         let background = OverlayGlassBackground(frame: .init(x: 0, y: 0, width: 620, height: 160))
         background.configure(appearance: .frosted, transparency: 0.34, frostAmount: 0.8,
@@ -75,6 +77,7 @@ import LyricsXCore
         #expect(gradient.animation(forKey: "appearance") == nil)
     }
 
+    @available(macOS 26, *)
     @Test func livePanelSettingsReachEverySurfaceWhileShownHiddenAndDetached() async throws {
         _ = NSApplication.shared
         let suite = "LyricsXThemeTest-" + UUID().uuidString
@@ -139,6 +142,7 @@ import LyricsXCore
         }
     }
 
+    @available(macOS 26, *)
     @Test func reducedTransparencyRestoresTheLastMaterialSettings() throws {
         let background = OverlayGlassBackground(frame: .init(x: 0, y: 0, width: 620, height: 160))
         for theme in [InterfaceTheme.dark, .light] {
@@ -156,6 +160,7 @@ import LyricsXCore
         }
     }
 
+    @available(macOS 26, *)
     @Test func glassTintMigratesWithoutChangingAppearanceAndAdjustsIndependently() throws {
         let suite = "LyricsXThemeTest-" + UUID().uuidString
         let defaults = try #require(UserDefaults(suiteName: suite))
@@ -197,6 +202,7 @@ import LyricsXCore
         }
     }
 
+    @available(macOS 26, *)
     @Test func opticalChangesReplaceOnlyTheMaterialAndKeepSliderUpdatesInPlace() throws {
         let background = OverlayGlassBackground(frame: .init(x: 0, y: 0, width: 620, height: 160))
         var previous: NSGlassEffectView?

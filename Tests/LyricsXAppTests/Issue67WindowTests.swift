@@ -229,6 +229,7 @@ private struct Issue67Repository: LyricsRepository {
         try capture(try #require(panel.contentView), name: "apple-music-source-settings")
     }
 
+    @available(macOS 26, *)
     @Test func animatedEditorReopenCannotBeClosedByAnOldCompletionAndNarrowControlsStayWhole() async throws {
         let (model, defaults, suite) = try makeModel()
         model.preferences.reduceMotion = false; model.preferences.overlayWidth = 320

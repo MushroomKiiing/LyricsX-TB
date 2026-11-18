@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "LyricsX",
-    platforms: [.macOS(.v26)],
+    platforms: [.macOS(.v15)],
     products: [
         .executable(name: "LyricsX", targets: ["LyricsXApp"]),
         .library(name: "LyricsXCore", targets: ["LyricsXCore"]),

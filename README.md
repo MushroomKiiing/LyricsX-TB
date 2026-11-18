@@ -1,12 +1,14 @@
 # LyricsX TB
 
-**简体中文** · [English](README.en.md)
+**简体中文** · [English](docs/README.en.md)
 
 <img src="Resources/Icon.iconset/icon_128x128.png" width="96" alt="LyricsX 音符图标">
 
 基于 [LyricsX Next](https://github.com/wzk112/LyricsX-Next) 的非官方 Touch Bar 定制版。
 
-[下载 TB.5](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5)
+**[下载 TB.6 兼容试用版](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.1/LyricsX-TB-2.0.43-tb.6-preview.1-universal.zip)** · macOS 15 或更新版本 · Apple 芯片（含 M1）和 Intel。
+
+[TB.5 正式版](https://github.com/MushroomKiiing/LyricsX-TB/releases/tag/v2.0.43-tb.5) · macOS 26 或更新版本 · 仅 Apple 芯片。
 
 ## 相比 LyricsX Next 的改进
 
@@ -20,7 +22,7 @@
 
 下载后将 LyricsX TB.app 放入“应用程序”，退出旧版后打开。在“设置 → Touch Bar”启用所需功能即可。
 
-TB.5 支持 Apple Silicon，最低 macOS 26，尚未经过 Apple 公证。
+TB.6 的 macOS 15 实体 Touch Bar 待验证。安装包尚未经过 Apple 公证。
 
 ## 致谢与许可证
 

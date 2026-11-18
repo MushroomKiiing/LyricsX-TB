@@ -293,7 +293,8 @@ private struct HDRDisplayScope: ViewModifier {
     }
 }
 extension View {
-    func hdrDisplayScope(requested: Bool, visible: Bool = true) -> some View {
-        modifier(HDRDisplayScope(requested: requested, visible: visible))
+    @ViewBuilder func hdrDisplayScope(requested: Bool, visible: Bool = true) -> some View {
+        if #available(macOS 26, *) { modifier(HDRDisplayScope(requested: requested, visible: visible)) }
+        else { self }
     }
 }

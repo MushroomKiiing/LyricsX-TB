@@ -95,7 +95,7 @@ struct SearchLyricPreview: View {
                 if browsing {
                     Button { browsing = false; follow(document, index: currentIndex, proxy: proxy, force: true) }
                     label: { Label("回到当前歌词", systemImage: "location.fill") }
-                        .buttonStyle(.glass).controlSize(.small)
+                        .compatibleGlassButton().controlSize(.small)
                 }
             }
         }.id(document.id)

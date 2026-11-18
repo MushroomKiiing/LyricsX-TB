@@ -121,6 +121,7 @@ private struct SizingRepository: LyricsRepository {
     }
 }
 
+@available(macOS 26, *)
 @MainActor @Test func glassGeometryFollowsResizesWithoutWaitingForDisplayOrHover() throws {
     let background = OverlayGlassBackground(frame: .init(x: 0, y: 0, width: 608, height: 84))
     background.configure(appearance: .glass, transparency: 0.26, frostAmount: 0.8,
@@ -138,6 +139,7 @@ private struct SizingRepository: LyricsRepository {
     }
 }
 
+@available(macOS 26, *)
 @MainActor @Test func nativeGlassSwitchKeepsOneNativeSurfaceAlignedThroughResizes() throws {
     let background = OverlayGlassBackground(frame: .init(x: 0, y: 0, width: 608, height: 84))
     background.appearance = NSAppearance(named: .darkAqua)
@@ -213,6 +215,7 @@ private struct SizingRepository: LyricsRepository {
     #expect(Preferences(defaults: defaults).overlayFrameRate == .display)
 }
 
+@available(macOS 26, *)
 @MainActor @Test func nativeWaitingHandoverKeepsTheDepartingLyricsInsideTheWindow() async throws {
     _ = NSApplication.shared
     let suite = "LyricsXTests-" + UUID().uuidString
@@ -266,6 +269,7 @@ private struct SizingRepository: LyricsRepository {
     #expect(glass.layer?.mask == nil)
 }
 
+@available(macOS 26, *)
 @MainActor @Test func nativeHeightResizeKeepsWidthHostingBoundsAndTopEdge() async throws {
     _ = NSApplication.shared
     let suite = "LyricsXTests-" + UUID().uuidString

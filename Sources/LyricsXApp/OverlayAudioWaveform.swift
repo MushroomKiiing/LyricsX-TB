@@ -278,6 +278,10 @@ final class WaveformSpectrumAnalyzer {
 /// A private, unmuted tap scoped to one player's bundle ID. Any failure leaves
 /// the waveform silent; there is deliberately no system-wide fallback.
 final class PlayerAudioWaveformTap {
+    static var isSupported: Bool {
+        if #available(macOS 26, *) { return true }
+        return false
+    }
     let bundleID: String
     let ring: WaveformSampleRing
     private(set) var sampleRate: Double = 48_000
@@ -289,7 +293,7 @@ final class PlayerAudioWaveformTap {
         self.bundleID = bundleID; self.ring = ring
     }
     func start() -> Bool {
-        guard !bundleID.isEmpty else { return false }
+        guard #available(macOS 26, *), !bundleID.isEmpty else { return false }
         let description = CATapDescription()
         description.name = "LyricsX Next Current Player Waveform"
         description.bundleIDs = [bundleID]

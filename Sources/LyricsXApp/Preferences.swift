@@ -63,6 +63,7 @@ final class Preferences {
     var overlayAdaptiveSize: Bool { didSet { save("overlayAdaptiveSize", overlayAdaptiveSize) } }
     var overlayFrameRate: OverlayFrameRate { didSet { save("overlayFrameRate", overlayFrameRate.rawValue) } }
     var overlayShowSongInfo: Bool { didSet { save("overlayShowSongInfo", overlayShowSongInfo) } }
+    var effectiveOverlayWaveformEnabled: Bool { PlayerAudioWaveformTap.isSupported && overlayWaveformEnabled }
     var overlayWaveformEnabled: Bool { didSet { save("overlayWaveformEnabled", overlayWaveformEnabled) } }
     var overlayWaveformStyle: OverlayWaveformStyle { didSet { save("overlayWaveformStyle", overlayWaveformStyle.rawValue) } }
     var overlayWaveformStatus = ""

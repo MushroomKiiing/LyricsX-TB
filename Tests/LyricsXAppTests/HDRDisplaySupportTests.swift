@@ -3,6 +3,7 @@ import Testing
 import SwiftUI
 @testable import LyricsXApp
 
+@available(macOS 26, *)
 @Test func brightnessEntryUsesTheSameNumericRangeAsTheEmitter() {
     #expect(HDRBrightness.parsed("2.6") == 2.6)
     #expect(HDRBrightness.parsed(" 1,8× ") == 1.8)
@@ -68,6 +69,7 @@ import SwiftUI
 }
 
 @Suite(.serialized) @MainActor struct HDRWindowLifecycleTests {
+    @available(macOS 26, *)
     @Test func windowOutputRequestsRemainIndependentAndStopOnDetach() async throws {
         _ = NSApplication.shared
         let first = NSPanel(contentRect: .init(x: 100, y: 100, width: 2, height: 2),
@@ -108,6 +110,7 @@ import SwiftUI
         #expect(!b.observing)
     }
 
+    @available(macOS 26, *)
     @Test func readerPublishesOnAttachmentRecoversAfterFocusAndCancelsOnDetach() async throws {
         _ = NSApplication.shared
         let window = NSWindow(contentRect: .init(x: 100, y: 100, width: 150, height: 100),

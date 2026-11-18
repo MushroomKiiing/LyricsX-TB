@@ -1,3 +1,7 @@
+# LyricsX TB 2.0.43-TB.6-preview.1（279.11）
+
+新增 macOS 15 Sequoia 支持，安装包同时包含 Apple 芯片与 Intel。旧系统使用磨砂悬浮窗和普通亮度辉光；实时波形需要 macOS 26。
+
 # LyricsX TB 2.0.43-TB.5（279.10）
 
 恢复原音符图标，按功能分类介绍相对 Next 的全部改进；沿用原项目署名与许可。增加“歌词 → 缓存与资料库”的自动保存开关和清除缓存确认，清理移到废纸篓，保留实时显示与资料库。
@@ -6,7 +10,7 @@
 
 首次公开预览。整合后台 Touch Bar、自动全宽与 1–15 秒切换、左右双语、白色常规字；改进网易云播放状态读取，增加可选高清封面及随网易云启动；设置搜索、分组与样式范围说明落实到主程序。增加独立图标、许可与隐私说明，保留上游历史。
 
-完整比较见 [TB-COMPARISON.md](docs/TB-COMPARISON.md)，验证与限制见 [发布说明](docs/releases/v2.0.43-tb.5-preview.1.md)。本包为 arm64、ad-hoc 签名、未公证的非官方预览。
+完整比较见 [TB-COMPARISON.md](TB-COMPARISON.md)，验证与限制见 [发布说明](releases/v2.0.43-tb.5-preview.1.md)。本包为 arm64、ad-hoc 签名、未公证的非官方预览。
 
 ---
 
@@ -14,7 +18,7 @@
 
 # 更新记录
 
-发布包和安装说明见 [`docs/releases`](docs/releases)。
+发布包和安装说明见 [`docs/releases`](releases)。
 
 ## 2.0.43（279）— 2026-11-02
 

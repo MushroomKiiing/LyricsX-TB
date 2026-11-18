@@ -487,7 +487,11 @@ struct PreferencesView: View {
             }
             SettingsCard(title: "音频波形") {
                 SettingToggle(title: "显示实时波形", detail: "在悬浮窗底部显示当前播放器的音频波形；首次开启时 macOS 会请求系统音频录制权限。", value: $p.overlayWaveformEnabled)
-                if p.overlayWaveformEnabled {
+                    .disabled(!PlayerAudioWaveformTap.isSupported)
+                if !PlayerAudioWaveformTap.isSupported {
+                    Text("实时波形需要 macOS 26 或更新版本。歌词显示不受影响。").font(.caption).foregroundStyle(.secondary)
+                }
+                if p.effectiveOverlayWaveformEnabled {
                     SettingRow(title: "波形颜色", detail: "白色在浅色玻璃上带细暗边；封面彩色使用当前歌曲的配色。") {
                         Picker("波形颜色", selection: $p.overlayWaveformStyle) {
                             ForEach(OverlayWaveformStyle.allCases) { Text($0.title).tag($0) }
@@ -598,13 +602,15 @@ struct PreferencesView: View {
 
     private var hdrSettings: some View {
         @Bindable var p = model.preferences
-        let unavailable = !p.lyricGlow || p.reduceMotion || systemReduceMotion
+        let supportsHDR: Bool
+        if #available(macOS 26, *) { supportsHDR = true } else { supportsHDR = false }
+        let unavailable = !supportsHDR || !p.lyricGlow || p.reduceMotion || systemReduceMotion
         return SettingsCard(title: "HDR / EDR 辉光") {
             SettingToggle(title: "HDR 辉光增强", detail: "按所在屏幕能力增强长音辉光。普通屏幕自动使用普通亮度；需先开启长音辉光。", impact: "高亮效果可能更刺眼并增加能耗；实际亮度由屏幕和系统决定。", value: $p.lyricHDR)
                 .disabled(unavailable)
+            if !supportsHDR { Text("macOS 15 使用普通亮度的辉光。").font(.caption).foregroundStyle(.secondary) }
             if p.lyricHDR {
-            HDRBrightnessControl(value: $p.lyricHDRBrightness)
-                .disabled(unavailable)
+                HDRBrightnessControl(value: $p.lyricHDRBrightness).disabled(unavailable)
             }
         }
     }

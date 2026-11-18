@@ -114,7 +114,7 @@ struct LyricGlowInk: Equatable {
         // ink by EDR headroom still leaves neutral palettes below SDR white.
         // Use a separate, lightly tinted emitter; the opaque dark glyph is
         // painted over it by HeldNoteRenderer, preserving the karaoke wipe.
-        guard value > 1 else { return Color(.sRGBLinear, red: red, green: green, blue: blue, opacity: 1) }
+        guard #available(macOS 26, *), value > 1 else { return Color(.sRGBLinear, red: red, green: green, blue: blue, opacity: 1) }
         let peak = max(red, green, blue, 0.001)
         func emission(_ channel: Double) -> Double { (0.78 + 0.22 * channel / peak) * value }
         return Color(.sRGBLinear, red: emission(red), green: emission(green), blue: emission(blue), opacity: 1).headroom(value)

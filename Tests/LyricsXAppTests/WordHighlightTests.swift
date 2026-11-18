@@ -98,12 +98,15 @@ import LyricsXCore
         #expect(try energy(after) > energy(before) * 1.5)
     }
 
+    @available(macOS 26, *)
+
     @Test func hdrInkCarriesExtendedRangeAndDefaultStaysSDR() {
         let resolved = HeldNoteRenderer.hdrWhite(brightness: 1.6).resolveHDR(in: EnvironmentValues())
         #expect(resolved.linearRed > 1.5 && resolved.headroom == 1.6)
         #expect(!LyricEmphasisOptions().usesHDR)
     }
 
+    @available(macOS 26, *)
     @Test func compactOverlayHaloReducesBloomWithoutRemovingHDRInk() throws {
         let full = try render(time: 1.6, effects: .init(lift: false, hdr: true, hdrBrightness: 3))
         let compact = try render(time: 1.6, effects: .init(lift: false, hdr: true, hdrBrightness: 3, compactHalo: true))
@@ -113,6 +116,7 @@ import LyricsXCore
         #expect(try energy(compact) > energy(ordinary))
     }
 
+    @available(macOS 26, *)
     @Test func defaultGlassAndMainUseTheSameHDRGlyphPeak() throws {
         let glass = LyricTypography().adaptedForGlass(dark: true).wordColors
         for brightness in [1.6, 2.5, 4.0] {
@@ -477,6 +481,7 @@ import LyricsXCore
         }
     }
 
+    @available(macOS 26, *)
     @Test func lightGlassHDRHaloExceedsWhiteWithoutBrighteningTheDarkGlyphCore() throws {
         for seed in ["000000", "FFFFFF", "F03868", "1020C0"] {
             let words = LyricTypography(primaryHex: seed).adaptedForGlass(dark: false).wordColors
@@ -507,6 +512,7 @@ import LyricsXCore
         }
     }
 
+    @available(macOS 26, *)
     @Test func lowHeadroomHDRRetainsTheOrdinaryHaloInsteadOfMakingItWeaker() throws {
         let words = LyricTypography().adaptedForGlass(dark: true).wordColors
         let plain = try linearPixels(render(time: 1.6, effects: .init(lift: false, glow: false), wordColors: words))
@@ -546,7 +552,7 @@ import LyricsXCore
         let renderer = ImageRenderer(content: view)
         renderer.scale = 1
         renderer.colorMode = .extendedLinear
-        renderer.allowedDynamicRange = effects.usesHDR ? .high : .standard
+        if #available(macOS 26, *) { renderer.allowedDynamicRange = effects.usesHDR ? .high : .standard }
         return try #require(renderer.cgImage)
     }
 

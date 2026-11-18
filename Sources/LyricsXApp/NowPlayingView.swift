@@ -163,15 +163,15 @@ private struct LyricsScrollContent: View {
                     emptyState(symbol: "waveform", title: "未在播放", detail: "打开播放器并播放歌曲。")
                         .frame(height: 175)
                     HStack(spacing: 12) {
-                        Button("打开 Apple Music") { NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/Music.app")) }.buttonStyle(.glass)
-                        Button("预览动效") { if let show = model.showPreviewWindow { show() } else { openWindow(id: "preview") } }.buttonStyle(.glass)
+                        Button("打开 Apple Music") { NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/Music.app")) }.compatibleGlassButton()
+                        Button("预览动效") { if let show = model.showPreviewWindow { show() } else { openWindow(id: "preview") } }.compatibleGlassButton()
                     }
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 trackTitlePlaceholder
             }
             Button { browsing = false } label: { Label("回到当前歌词", systemImage: "location.fill") }
-                .buttonStyle(.glass).padding(.bottom, 20)
+                .compatibleGlassButton().padding(.bottom, 20)
                 .opacity(browsing ? 1 : 0)
                 .allowsHitTesting(browsing)
                 .disabled(!browsing)
@@ -211,7 +211,7 @@ private struct LyricsScrollContent: View {
     private func placeholderStatus(_ title: String, action: String, perform: @escaping () -> Void) -> some View {
         HStack(spacing: 10) {
             Text(title).foregroundStyle(.secondary)
-            Button(action, action: perform).buttonStyle(.glass)
+            Button(action, action: perform).compatibleGlassButton()
         }.font(.system(size: 13))
     }
 

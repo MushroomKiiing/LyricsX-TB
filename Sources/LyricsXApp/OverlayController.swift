@@ -406,7 +406,7 @@ final class OverlayController: NSObject, NSWindowDelegate {
             updateWaveform()
         } else {
             let source = model.session.track?.playerID
-            waveform.freezeVisualForFade(enabled: prefs.overlayWaveformEnabled,
+            waveform.freezeVisualForFade(enabled: prefs.effectiveOverlayWaveformEnabled,
                 playing: model.session.isPlaying, source: source,
                 trackRevision: model.session.trackRevision)
         }
@@ -521,7 +521,7 @@ final class OverlayController: NSObject, NSWindowDelegate {
 
     private func updateWaveform() {
         let prefs = model.preferences
-        waveform.configure(enabled: prefs.overlayWaveformEnabled,
+        waveform.configure(enabled: prefs.effectiveOverlayWaveformEnabled,
             visible: lastVisible && !hoverHidden && !waveformSuspended,
             playing: model.session.isPlaying,
             reducedMotion: prefs.reduceMotion || NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
@@ -598,7 +598,7 @@ final class OverlayController: NSObject, NSWindowDelegate {
         let mode = display.mode
         // Keep one positioning rule through waiting/card/lyric changes.
         // Switching rules before the native resize moved the host instantly.
-        centersVisibleContent = !p.overlayWaveformEnabled
+        centersVisibleContent = !p.effectiveOverlayWaveformEnabled
         showsPinnedHeader = mode == .lyrics && p.overlayShowSongInfo
         // No observation of the display clock: only a line/setting change can
         // request a new size. Retarget native animation immediately in either direction.
@@ -611,7 +611,7 @@ final class OverlayController: NSObject, NSWindowDelegate {
             p.overlayAdaptiveSize ? 1 : 0, Double(mode.rawValue), p.showTranslation ? 1 : 0,
             p.overlayPrimarySpacing, p.overlaySecondarySpacing,
             p.overlayTextSpacing.primaryLineSpacing, p.overlayTextSpacing.translationLineSpacing]
-            + [p.overlayWaveformEnabled ? 1 : 0]
+            + [p.effectiveOverlayWaveformEnabled ? 1 : 0]
         let changed = configuration != lastSizingConfiguration
         let replaced = display.documentRevision != sizingDocumentRevision
         if replaced, let document { OverlayTextMeasure.invalidateLayoutText(for: document.id) }
@@ -619,18 +619,18 @@ final class OverlayController: NSObject, NSWindowDelegate {
             || mode == .song && (card.displayedTitle != sizingSongTitle || card.displayedArtist != sizingSongArtist) {
             if mode == .waiting { desiredSize = NSSize(width: maximum, height: OverlayPresentationMode.waitingHeight) }
             else if mode == .song { desiredSize = NSSize(width: maximum,
-                height: card.baseHeight(waveformEnabled: p.overlayWaveformEnabled)) }
+                height: card.baseHeight(waveformEnabled: p.effectiveOverlayWaveformEnabled)) }
             else { desiredSize = NSSize(width: maximum, height: OverlayLyricsWindowLayout.baseHeight(
                 document: document, index: index, preferences: p, maximumWidth: maximum)) }
             desiredSize.height = OverlayWaveformLayout.totalHeight(content: desiredSize.height,
-                enabled: p.overlayWaveformEnabled)
+                enabled: p.effectiveOverlayWaveformEnabled)
             sizingDocumentRevision = display.documentRevision
             sizingDocument = document?.id; sizingIndex = index; sizingConversion = p.conversion
             sizingFont = p.lyricFontName
             sizingSongTitle = card.displayedTitle; sizingSongArtist = card.displayedArtist
         }
         lastSizingConfiguration = configuration
-        applySize(desiredSize, cardHeight: card.baseHeight(waveformEnabled: p.overlayWaveformEnabled))
+        applySize(desiredSize, cardHeight: card.baseHeight(waveformEnabled: p.effectiveOverlayWaveformEnabled))
     }
 
     private func applySize(_ measuredSize: NSSize, cardHeight: Double) {
@@ -643,7 +643,7 @@ final class OverlayController: NSObject, NSWindowDelegate {
         let canvas = NSSize(width: maximum, height: max(size.height,
             OverlayWaveformLayout.totalHeight(content:
                 max(cardHeight, OverlayLayoutMetrics.height(preferences: p)),
-                enabled: p.overlayWaveformEnabled)))
+                enabled: p.effectiveOverlayWaveformEnabled)))
         if content.frame.size != canvas { content.setFrameSize(canvas) }
         positionContent()
         // A requested size is not evidence that the native animation arrived.
@@ -900,7 +900,7 @@ struct OverlayView: View {
         let maximum = model.preferences.overlayLayoutWidth
         let display = presentation?.held ?? OverlayDisplaySnapshot(model: model, at: ProcessInfo.processInfo.systemUptime)
         let compact = display.compact
-        let waveformEnabled = model.preferences.overlayWaveformEnabled
+        let waveformEnabled = model.preferences.effectiveOverlayWaveformEnabled
         let centeredLyrics = display.mode == .lyrics && !waveformEnabled
         let card = OverlaySongCardLayout(width: maximum, title: display.track?.title,
             artist: display.track?.artist)
@@ -946,7 +946,7 @@ struct OverlayView: View {
                         }
                         .shadow(color: .black.opacity(lightGlass ? 0.12 : 0.85), radius: 2, y: 1)
                         .accessibilityElement(children: .ignore).accessibilityLabel("等待歌词")
-                        Spacer(minLength: model.preferences.overlayWaveformEnabled ? 0 : 10)
+                        Spacer(minLength: model.preferences.effectiveOverlayWaveformEnabled ? 0 : 10)
                     }
                 } else if compact {
                     OverlaySongCardTransition(display: display, layout: card, lightGlass: lightGlass,
@@ -964,7 +964,7 @@ struct OverlayView: View {
                         Spacer(minLength: 4)
                         lyricBody(display: display, maximum: maximum, lightGlass: lightGlass,
                             centerVisibleContent: false)
-                        Spacer(minLength: model.preferences.overlayWaveformEnabled ? 0 : 10)
+                        Spacer(minLength: model.preferences.effectiveOverlayWaveformEnabled ? 0 : 10)
                     }
                 }
             }

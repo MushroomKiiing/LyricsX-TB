@@ -20,6 +20,7 @@ private let overlayLyrics = LyricsDocument(title: "Overlay Song", artist: "Artis
     lines: [.init(id: 0, time: 0, text: "Visible lyric")])
 
 @Suite @MainActor struct PresentationRegressionTests {
+    @available(macOS 26, *)
     @Test func reducingMotionDuringResizeSettlesAnchorGlassAndControls() async throws {
         _ = NSApplication.shared
         let suite = "LyricsXTests-" + UUID().uuidString
@@ -60,6 +61,7 @@ private let overlayLyrics = LyricsDocument(title: "Overlay Song", artist: "Artis
         #expect(overlay.controlsView.isHidden && overlay.controlsView.alphaValue == 0)
     }
 
+    @available(macOS 26, *)
     @Test func hoverFadesWholePanelAndCancelsRapidReentry() async throws {
         _ = NSApplication.shared
         let suite = "LyricsXTests-" + UUID().uuidString
@@ -589,6 +591,7 @@ private let overlayLyrics = LyricsDocument(title: "Overlay Song", artist: "Artis
         model.stop()
     }
 
+    @available(macOS 26, *)
     @Test(.enabled(if: ProcessInfo.processInfo.environment["LYRICSX_CONTROL_QA"] != nil))
     func renderControlsOverLightAndDarkBackgrounds() async throws {
         _ = NSApplication.shared

@@ -191,11 +191,13 @@ struct HeldNoteRenderer: TextRenderer {
     // Extra drawing space doesn't affect measured text size or window position.
     var displayPadding: EdgeInsets { .init(top: 12, leading: 12, bottom: 12, trailing: 12) }
     static func hdrWhite(brightness: Double) -> Color {
+        guard #available(macOS 26, *) else { return .white }
         let value = HDRBrightness.clamped(brightness)
         return Color(.sRGBLinear, white: value, opacity: 1).headroom(value)
     }
 
     static func hdrInk(_ color: Color, brightness: Double) -> Color {
+        guard #available(macOS 26, *) else { return color }
         let value = HDRBrightness.clamped(brightness)
         let ink = color.resolveHDR(in: EnvironmentValues())
         return Color(.sRGBLinear, red: Double(ink.linearRed) * value,

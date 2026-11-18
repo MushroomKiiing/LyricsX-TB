@@ -16,3 +16,7 @@ LYRICSX_ARCHS=arm64 scripts/build.sh release
 产物为 `build/LyricsX TB.app`。`LYRICSX_BUILD_PATH` 可指定独立 scratch 路径，`LYRICSX_SIGN_IDENTITY` 指定签名身份；本次发布使用 ad-hoc，未公证。可尝试 `LYRICSX_ARCHS=universal`，但本次只发布本机验证过的 arm64 包，不声称 Intel 实机验证。
 
 图标保留上游的 Resources/Icon.iconset 音符资源，由构建脚本打包。Touch Bar 使用系统非公开桥接，网易云读取也依赖系统/客户端实现，因此系统升级可能影响兼容性。请阅读对应 Release 的测试记录和已知限制。
+
+## TB.6 兼容试用包
+
+在 TB.6 源码上运行 `LYRICSX_ARCHS=universal scripts/build.sh release` 可构建面向 macOS 15 及更新系统的通用包。建议使用保留 Intel Swift 支持的工具链。如果较新的 Apple 芯片工具链缺少旧版 Intel Swift 兼容库，可在构建 TB.6 时加上 `LYRICSX_SKIP_PRE_SEQUOIA_RUNTIME_SHIMS=1`，改用系统自带的 Swift 运行时。此选项必须配合 macOS 15 或更新的最低目标使用；不能据此将最低系统继续下调。通过签名和架构检查之后，仍要在 macOS 15 的实体 MacBook Pro 上验证 Touch Bar。

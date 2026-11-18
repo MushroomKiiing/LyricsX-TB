@@ -10,9 +10,14 @@ enum OverlayAppearance: String, CaseIterable, Identifiable {
     static let frostRange = 0.0...1.0
     var defaultFrost: Double { self == .glass ? 0.55 : 0.82 }
     var id: String { rawValue }
-    var title: String { self == .glass ? "Liquid Glass" : "磨砂阅读" }
+    var title: String {
+        guard self == .glass else { return "磨砂阅读" }
+        if #available(macOS 26, *) { return "Liquid Glass" }
+        return "深色磨砂"
+    }
     var detail: String {
-        self == .glass ? "高透原生玻璃与折射亮边，统一外观，歌词带对比保护。"
+        if #unavailable(macOS 26), self == .glass { return "使用系统磨砂材质和深色背景。" }
+        return self == .glass ? "高透原生玻璃与折射亮边，统一外观，歌词带对比保护。"
             : "柔化后方细节，配合较浅底色，让歌词更容易阅读。"
     }
 

@@ -5,7 +5,8 @@ import QuartzCore
 /// view. AppKit owns refraction; no optical masks or copied desktop surface.
 @MainActor
 final class OverlayGlassBackground: NSView {
-    private var glass = OverlayNativeGlassView()
+    private var glass: NSView
+    private let preferNativeGlass: Bool
     private let scrim = OverlayGradientView()
     private var configuration: Configuration?
     private var applyingConfiguration = false
@@ -18,20 +19,24 @@ final class OverlayGlassBackground: NSView {
         let dark: Bool
     }
 
-    override init(frame: NSRect) {
+    override convenience init(frame: NSRect) {
+        self.init(frame: frame, preferNativeGlass: true)
+    }
+
+    init(frame: NSRect, preferNativeGlass: Bool) {
+        self.preferNativeGlass = preferNativeGlass
+        glass = Self.makeMaterial(frame: frame, preferNativeGlass: preferNativeGlass)
         super.init(frame: frame)
         wantsLayer = true
         layer?.cornerRadius = 24
         layer?.cornerCurve = .continuous
-        glass.cornerRadius = 24
         glass.frame = bounds
         glass.autoresizingMask = [.width, .height]
         // The owning window or preview supplies the same explicit appearance
         // as its foreground ink. Do not seed a conflicting dark appearance.
-        glass.tintColor = nil
         glass.wantsLayer = true
         scrim.wantsLayer = true
-        glass.contentView = scrim
+        attachScrim(to: glass)
         addSubview(glass)
     }
 
@@ -92,7 +97,7 @@ final class OverlayGlassBackground: NSView {
         // keeps the existing surface; the lyric host is never replaced.
         let previousGlass = glass
         if replacesOptics {
-            glass = OverlayNativeGlassView(frame: bounds)
+            glass = Self.makeMaterial(frame: bounds, preferNativeGlass: preferNativeGlass)
             glass.autoresizingMask = [.width, .height]
             glass.wantsLayer = true
         }
@@ -101,13 +106,19 @@ final class OverlayGlassBackground: NSView {
         // Resolve explicit appearance before changing style: AppKit builds the
         // backdrop for that style immediately. Both styles use matching fixed
         // ink, so neither may independently adapt to the desktop underneath.
-        glass.setFixedMaterialAppearance(true)
         let nativeAppearance: NSAppearance.Name = !dark ? .aqua : .darkAqua
         if glass.appearance?.name != nativeAppearance { glass.appearance = NSAppearance(named: nativeAppearance) }
-        let style: NSGlassEffectView.Style = appearance == .glass ? .clear : .regular
-        if glass.style != style { glass.style = style }
         let radius: CGFloat = appearance == .glass ? 32 : 24
-        if glass.cornerRadius != radius { glass.cornerRadius = radius }
+        if #available(macOS 26, *), let native = glass as? OverlayNativeGlassView {
+            native.setFixedMaterialAppearance(true)
+            let style: NSGlassEffectView.Style = appearance == .glass ? .clear : .regular
+            if native.style != style { native.style = style }
+            if native.cornerRadius != radius { native.cornerRadius = radius }
+        } else if let backdrop = glass as? NSVisualEffectView {
+            backdrop.material = appearance == .glass ? .hudWindow : .popover
+            backdrop.layer?.cornerRadius = radius
+            backdrop.layer?.masksToBounds = true
+        }
         layer?.cornerRadius = radius
         gradient.cornerRadius = radius
         // Liquid Glass always remains fully composited: fading it introduces
@@ -125,8 +136,8 @@ final class OverlayGlassBackground: NSView {
         gradient.colors = appearance.shadeOpacities(transparency: next.transparency, dark: dark)
             .map { scrimColor.withAlphaComponent($0).cgColor }
         if replacesOptics {
-            previousGlass.contentView = nil
-            glass.contentView = scrim
+            detachScrim(from: previousGlass)
+            attachScrim(to: glass)
             replaceSubview(previousGlass, with: glass)
             synchronizeGeometry()
         }
@@ -142,9 +153,38 @@ final class OverlayGlassBackground: NSView {
         }
     }
 
+    private static func makeMaterial(frame: NSRect, preferNativeGlass: Bool) -> NSView {
+        if #available(macOS 26, *), preferNativeGlass {
+            let view = OverlayNativeGlassView(frame: frame)
+            view.cornerRadius = 24
+            return view
+        }
+        let view = NSVisualEffectView(frame: frame)
+        view.blendingMode = .behindWindow
+        view.state = .active
+        return view
+    }
+
+    private func attachScrim(to material: NSView) {
+        if #available(macOS 26, *), let native = material as? NSGlassEffectView {
+            native.contentView = scrim
+        } else {
+            material.addSubview(scrim)
+        }
+    }
+
+    private func detachScrim(from material: NSView) {
+        if #available(macOS 26, *), let native = material as? NSGlassEffectView {
+            native.contentView = nil
+        } else {
+            scrim.removeFromSuperview()
+        }
+    }
+
 }
 
 /// Isolate compatibility behavior from the window and lyric drawing code.
+@available(macOS 26, *)
 @MainActor private final class OverlayNativeGlassView: NSGlassEffectView {
     private var savedAdaptiveAppearance: Int?
 

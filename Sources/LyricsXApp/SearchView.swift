@@ -19,7 +19,7 @@ struct SearchView: View {
                 TextField("歌曲名和歌手", text: $search.query).textFieldStyle(.plain).onSubmit { controller.search() }
                 ProgressView().controlSize(.small).opacity(controller.searching ? 1 : 0)
                     .frame(width: 16, height: 16).accessibilityHidden(!controller.searching)
-                Button("搜索", action: controller.search).buttonStyle(.glassProminent).disabled(controller.query.trimmingCharacters(in: .whitespaces).isEmpty)
+                Button("搜索", action: controller.search).compatibleGlassButton(prominent: true).disabled(controller.query.trimmingCharacters(in: .whitespaces).isEmpty)
             }.padding(12).background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 14))
             HStack(spacing: 10) {
                 Toggle("完整搜索", isOn: $search.completeSearch).toggleStyle(.switch).controlSize(.small)
@@ -81,7 +81,7 @@ struct SearchView: View {
                                     Button("预览") { controller.preview(candidate) }
                                         .accessibilityLabel("预览《" + candidate.document.title + "》，" + candidate.document.source)
                                         .disabled(controller.retainedPreviousResults)
-                                        .buttonStyle(.glass)
+                                        .compatibleGlassButton()
                                     if applied {
                                         Label("已应用", systemImage: "checkmark.circle.fill")
                                             .font(.caption2).foregroundStyle(Color.accentColor)
@@ -98,7 +98,7 @@ struct SearchView: View {
                     SearchLyricPreview(model: model, document: controller.previewCandidate?.document ?? model.session.document,
                         isPreview: controller.previewCandidate != nil)
                     Button(controller.previewIsApplied ? "已应用当前歌词" : "应用当前歌词", action: controller.applyPreview)
-                        .buttonStyle(.glassProminent).disabled(!controller.canApplyPreview)
+                        .compatibleGlassButton(prominent: true).disabled(!controller.canApplyPreview)
                     Text(controller.previewIsApplied ? "已应用，仍可继续预览其他版本。" : "预览不会替换或保存正式歌词。")
                         .font(.caption2).foregroundStyle(.secondary)
                     if let issue = model.session.persistenceError {
@@ -146,7 +146,7 @@ struct LibraryView: View {
                             Text(selected.track.title).font(.title2.bold())
                             Text(LyricsCodec.export(selected.document, plain: true)).font(.system(size: 15)).lineSpacing(8).textSelection(.enabled)
                             Button("在 Finder 中显示") { NSWorkspace.shared.activateFileViewerSelecting([selected.url]) }
-                            if model.session.track != nil { Button("用于当前歌曲") { model.applyLyrics(selected.document, forTrackID: model.session.track?.id); dismiss() }.buttonStyle(.glass) }
+                            if model.session.track != nil { Button("用于当前歌曲") { model.applyLyrics(selected.document, forTrackID: model.session.track?.id); dismiss() }.compatibleGlassButton() }
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(20)
                     } else { ContentUnavailableView("选择一首歌曲", systemImage: "text.book.closed", description: Text("这里直接显示现有缓存文件夹中的歌词。")) }
                 }.frame(minWidth: 310)

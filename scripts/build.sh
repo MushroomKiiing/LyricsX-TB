@@ -31,6 +31,11 @@ esac
 for architecture in $REQUESTED_ARCHS; do
   BUILD_ARGS+=(--arch "$architecture")
 done
+# New Apple silicon-only toolchains may lack Intel copies of pre-Sequoia
+# Swift compatibility shims. The supported runtime starts at macOS 15.
+if [[ "${LYRICSX_SKIP_PRE_SEQUOIA_RUNTIME_SHIMS:-}" == 1 ]]; then
+  BUILD_ARGS+=(-Xswiftc -runtime-compatibility-version -Xswiftc none)
+fi
 swift build "${BUILD_ARGS[@]}"
 BIN_DIR="$(swift build "${BUILD_ARGS[@]}" --show-bin-path)"
 mkdir -p "$PROJECT_ROOT/build"
@@ -48,7 +53,7 @@ AGENT_ARCHS="${REQUESTED_ARCHS:-$(uname -m)}"
 AGENT_SLICES=()
 for architecture in $AGENT_ARCHS; do
   slice="$STAGE_ROOT/NetEaseLaunchAgent-$architecture"
-  xcrun swiftc -O -swift-version 5 -target "$architecture-apple-macos26.0" Resources/NetEaseLaunchAgent.swift -o "$slice"
+  xcrun swiftc -O -swift-version 5 -target "$architecture-apple-macos15.0" Resources/NetEaseLaunchAgent.swift -o "$slice"
   AGENT_SLICES+=("$slice")
 done
 lipo -create "${AGENT_SLICES[@]}" -output "$APP/Contents/MacOS/LyricsXNetEaseLaunchAgent"
@@ -60,7 +65,7 @@ if [[ -n "$REQUESTED_ARCHS" ]]; then
   READER_ARCH_ARGS=()
   for architecture in $REQUESTED_ARCHS; do READER_ARCH_ARGS+=(-arch "$architecture"); done
 fi
-clang -dynamiclib -install_name @rpath/libLyricsXNeteaseReader.dylib -fobjc-arc -fblocks -framework Foundation -mmacosx-version-min=26.0 "${READER_ARCH_ARGS[@]}" \
+clang -dynamiclib -install_name @rpath/libLyricsXNeteaseReader.dylib -fobjc-arc -fblocks -framework Foundation -mmacosx-version-min=15.0 "${READER_ARCH_ARGS[@]}" \
   Resources/NeteaseReader.m -o "$APP/Contents/Frameworks/libLyricsXNeteaseReader.dylib"
 iconutil -c icns Resources/Icon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
 for dylib in "$BIN_DIR"/*.dylib; do
