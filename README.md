@@ -9,9 +9,9 @@
 ## 下载
 
 - **[直接下载正式版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.1/LyricsX-TB-2.0.43-tb.5.1-arm64.zip)**：macOS 26+，Apple 芯片。
-- **[直接下载兼容版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.2/LyricsX-TB-2.0.43-tb.6-preview.2-universal.zip)**：macOS 15+，Apple 芯片（含 M1）和 Intel。仍在试用，macOS 15 实体 Touch Bar 待验证。
+- **[直接下载兼容版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.3/LyricsX-TB-2.0.43-tb.6-preview.3-universal.zip)**：macOS 15+，Apple 芯片（含 M1）和 Intel。仍在试用，macOS 15 实体 Touch Bar 待验证。
 
-[安装与排查](DOWNLOAD.md) · [历史版本](docs/releases/HISTORY.md)
+[安装与排查](docs/INSTALL.md) · [历史版本](docs/releases/HISTORY.md)
 
 ## 相比 LyricsX Next 的改进
 
