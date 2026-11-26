@@ -86,7 +86,7 @@ Liquid Glass 的透明度范围为 0–100%，只改变内部从顶部向下逐�
 - 下载包同时包含 Intel 与 Apple 芯片代码，要求 macOS 26 或以上。保留通用歌词偏移和上一版启动修复。
 - 「设置 → 关于 → 本次更新」可重看两页介绍，直接调整开关、打开预览；升级时只自动显示一次。
 
-下载 [LyricsX-Next-2.0.43.zip](https://github.com/wzk112/LyricsX-Next/releases/download/v2.0.43/LyricsX-Next-2.0.43.zip)，查看 [版本说明](docs/releases/v2.0.43.md) 和 [完整更新记录](CHANGELOG.md)。
+下载 [LyricsX-Next-2.0.43.zip](https://github.com/wzk112/LyricsX-Next/releases/download/v2.0.43/LyricsX-Next-2.0.43.zip)，查看 [版本说明](https://github.com/wzk112/LyricsX-Next/blob/main/docs/releases/v2.0.43.md) 和 [完整更新记录](https://github.com/wzk112/LyricsX-Next/blob/main/docs/CHANGELOG.md)。
 
 ### 2.0.42 更新
 
@@ -95,7 +95,7 @@ Liquid Glass 的透明度范围为 0–100%，只改变内部从顶部向下逐�
 - 修复 macOS 26.0 上的启动崩溃；#10 报告者已确认预览版能打开，正式版保留该修复和打包检查。
 - 「设置 → 关于 → 本次更新」可重看两页介绍，通用偏移可在介绍中直接调整。从 2.0.41 或预览版升级均只自动显示一次，已有设置继续保留。
 
-下载 [LyricsX-Next-2.0.42.zip](https://github.com/wzk112/LyricsX-Next/releases/download/v2.0.42/LyricsX-Next-2.0.42.zip)，查看 [版本说明](docs/releases/v2.0.42.md)和 [完整更新记录](CHANGELOG.md)。
+下载 [LyricsX-Next-2.0.42.zip](https://github.com/wzk112/LyricsX-Next/releases/download/v2.0.42/LyricsX-Next-2.0.42.zip)，查看 [版本说明](https://github.com/wzk112/LyricsX-Next/blob/main/docs/releases/v2.0.42.md)和 [完整更新记录](https://github.com/wzk112/LyricsX-Next/blob/main/docs/CHANGELOG.md)。
 
 ### 2.0.41 更新
 
@@ -105,7 +105,7 @@ Liquid Glass 的透明度范围为 0–100%，只改变内部从顶部向下逐�
 - 悬浮窗控制条新增歌词同步面板，「设置 → 悬浮窗 → 外观」可隐藏顶部歌曲信息；修复布局、Music 意外重启及波形恢复问题。
 - 「设置 → 关于 → 本次更新」提供五页介绍及实际设置控件。公开包仍未公证，波形更新后可能需要重新确认系统音频录制权限。
 
-版本说明见 [`docs/releases/v2.0.41.md`](docs/releases/v2.0.41.md)，完整记录见 [`CHANGELOG.md`](CHANGELOG.md)。
+版本说明见 [`docs/releases/v2.0.41.md`](https://github.com/wzk112/LyricsX-Next/blob/main/docs/releases/v2.0.41.md)，完整记录见 [`CHANGELOG.md`](https://github.com/wzk112/LyricsX-Next/blob/main/docs/CHANGELOG.md)。
 
 ## 设置
 
@@ -125,7 +125,7 @@ Liquid Glass 的透明度范围为 0–100%，只改变内部从顶部向下逐�
    xattr -dr com.apple.quarantine "/Applications/LyricsX Next.app"
    ```
 
-完整的安装、签名和版本说明见 [`docs/releases/v2.0.43.md`](docs/releases/v2.0.43.md)。
+完整的安装、签名和版本说明见 [`docs/releases/v2.0.43.md`](https://github.com/wzk112/LyricsX-Next/blob/main/docs/releases/v2.0.43.md)。
 
 ## 播放器权限
 

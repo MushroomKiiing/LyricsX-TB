@@ -35,13 +35,13 @@
 	<key>CFBundleShortVersionString</key>
 	<string>2.0.43</string>
 	<key>CFBundleVersion</key>
-	<string>279.15</string>
+	<string>279.16</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>26.0</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>LyricsXReleaseVersion</key>
-	<string>2.0.43-TB.5.2</string>
+	<string>2.0.43-TB.5.3</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>LyricsX TB 读取当前歌曲和播放进度，以显示同步歌词，并响应你的播放控制。</string>
 	<key>NSAudioCaptureUsageDescription</key>

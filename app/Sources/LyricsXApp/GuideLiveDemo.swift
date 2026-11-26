@@ -219,7 +219,7 @@ struct GuideLiveDemo: View {
             HStack {
                 Label("主窗口 · 实际切歌与排版", systemImage: "play.rectangle")
                 Spacer()
-                Text("点击下方切歌查看").foregroundStyle(.secondary)
+                Text("可切换演示歌曲").foregroundStyle(.secondary)
             }.font(.caption)
         } else {
         HStack(spacing: 10) {

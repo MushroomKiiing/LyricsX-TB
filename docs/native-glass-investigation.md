@@ -1,6 +1,6 @@
 # Native glass investigation — 2026-09-23
 
-Historical development notes for the material included in 2.0.35. Build-specific “not published” and experiment statements below describe those earlier local snapshots. For final release scope and validation, see [2.0.35](releases/v2.0.35.md) and [release QA](qa-v2.0.35.md).
+Historical development notes for the material included in 2.0.35. Build-specific “not published” and experiment statements below describe those earlier local snapshots. For final release scope and validation, see [2.0.35](https://github.com/wzk112/LyricsX-Next/blob/main/docs/releases/v2.0.35.md) and [release QA](qa-v2.0.35.md).
 
 The new native material replaces the local Liquid Glass option. Build 260 introduced the independent appearance settings; the build 261 follow-up is documented below. GitHub has not been changed. It adds independent application/overlay appearance choices and frame-target sampling.
 

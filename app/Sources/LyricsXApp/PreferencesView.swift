@@ -727,7 +727,7 @@ struct PreferencesView: View {
                 Image(systemName: "quote.bubble.fill").font(.largeTitle).foregroundStyle(.pink)
             }
             SettingRow(title: "项目与署名", detail: "本地修改分支，基于 Zikai Wang（wzk112）的 LyricsX-Next 2.0.43；原项目 ddddxxx/LyricsX 与 MxIris-LyricsX-Project/LyricsX。保留 MPL-2.0 与依赖许可，不代表原作者发布或背书。") { EmptyView() }
-            SettingRow(title: "使用指南", detail: "8 页简短图文介绍；详细操作见左侧“使用说明”。") {
+            SettingRow(title: "使用指南", detail: "7 页简短图文介绍；详细操作见左侧“使用说明”。") {
                 Button("查看教程") { model.showFeatureGuide?(true) }
             }
             SettingRow(title: "本次更新", detail: "重新查看当前版本新增的功能、修复和优化。") {

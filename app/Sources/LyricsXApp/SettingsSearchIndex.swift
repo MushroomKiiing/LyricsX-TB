@@ -108,7 +108,7 @@ enum SettingsSearchIndex {
         .init(section: .about, title: "LyricsX TB", detail: "查看对应设置。", keywords: ""),
         .init(section: .about, title: "Touch Bar 非官方定制版", detail: "查看本地版本号与开源项目署名。", keywords: ""),
         .init(section: .about, title: "项目与署名", detail: "本地修改分支，基于 Zikai Wang（wzk112）的 LyricsX-Next 2.0.43；原项目 ddddxxx/LyricsX 与 MxIris-LyricsX-Project/LyricsX。保留 MPL-2.0 与依赖许可，不代表原作者发布或背书。", keywords: ""),
-        .init(section: .about, title: "使用指南", detail: "8 页简短图文介绍；详细操作见左侧“使用说明”。", keywords: ""),
+        .init(section: .about, title: "使用指南", detail: "7 页简短图文介绍；详细操作见左侧“使用说明”。", keywords: ""),
         .init(section: .about, title: "本次更新", detail: "重新查看当前版本新增的功能、修复和优化。", keywords: ""),
         .init(section: .about, title: "LyricsX TB 项目", detail: "本定制版的源码、发布记录及问题反馈。", keywords: ""),
         .init(section: .about, title: "上游项目主页", detail: "原项目 LyricsX Next 的源码和说明，不是本地定制版的仓库。", keywords: ""),

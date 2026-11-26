@@ -47,104 +47,84 @@ struct GuidePage: Identifiable {
 
 enum GuideContent {
     // Changed only when the introduction itself is revised, never for a routine rebuild.
-    static let revision = "compact-guide-tb52"
+    static let revision = "compact-guide-tb53"
     static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.43"
     static let displayVersion = Bundle.main.object(forInfoDictionaryKey: "LyricsXReleaseVersion") as? String ?? version
     static let tutorial: [GuidePage] = [
-        .init(id: "start", title: "先播放一首歌", subtitle: "连接播放器", symbol: "play.circle", points: [
-            "打开网易云、Apple Music、Spotify 或 QQ 音乐，歌词会自动同步。",
-            "未识别到歌曲时，在“设置 → 播放器”选择来源。"], illustration: "livePlayer"),
-        .init(id: "touchbar", title: "在 Touch Bar 看歌词", subtitle: "设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
-            "开启歌词和后台显示，切到其他应用也能继续看。",
-            "需要配备 Touch Bar 的 MacBook Pro。"], illustration: "touchBar43"),
-        .init(id: "fullwidth", title: "轻触切换全宽", subtitle: "设置 → Touch Bar", symbol: "arrow.left.and.right", points: [
-            "开启自动全宽，闲置后歌词铺满触控条。",
-            "轻触歌词或两侧空白，唤回右侧控制条。等待时间可在设置调整。"], illustration: "touchBarModes"),
-        .init(id: "translation", title: "原文与翻译，左右看", subtitle: "设置 → 歌词 / Touch Bar", symbol: "character.bubble", points: [
-            "先开翻译总开关，再选择 Touch Bar 是否显示译文。",
-            "译文显示在右侧；悬浮窗的翻译在“设置 → 悬浮窗”单独选择。"], illustration: "touchBarTranslation"),
-        .init(id: "overlay", title: "也可以放在桌面上", subtitle: "设置 → 悬浮窗", symbol: "rectangle.on.rectangle", points: [
-            "用主窗口的叠窗按钮显示或隐藏悬浮歌词。",
-            "解锁后拖动位置，锁定后可开启点击穿透。"], illustration: "overlay"),
-        .init(id: "fonts", title: "调整喜欢的外观", subtitle: "设置 → 外观 / 字体与颜色", symbol: "paintpalette", points: [
-            "主窗口和悬浮窗可调整字体、配色与材质。",
-            "Touch Bar 保持白色常规字体。"], illustration: "font"),
-        .init(id: "find", title: "歌词不对或不同步", subtitle: "搜索歌词 / 设置 → 歌词同步", symbol: "magnifyingglass", points: [
-            "点击放大镜或按 ⌘F，预览后应用其他歌词版本。",
-            "歌词慢了用正偏移提前，快了用负偏移延后。"], illustration: "search"),
-        .init(id: "help", title: "需要时再看详细说明", subtitle: "设置 → 使用说明", symbol: "book.closed", points: [
-            "详细图文按主题查阅，设置里也能搜索功能。",
-            "自动保存与清除缓存在“设置 → 歌词”；可选联网功能附有隐私说明。"], illustration: "manual")
+        .init(id: "start", title: "播放同步", subtitle: "设置 → 播放器", symbol: "play.circle", points: [
+            "播放网易云、Apple Music、Spotify 或 QQ 音乐时，歌词自动同步。",
+            "播放器来源可在设置中选择。"], illustration: "livePlayer"),
+        .init(id: "touchbar", title: "Touch Bar 歌词", subtitle: "设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
+            "可在设置中开启 Touch Bar 歌词与后台显示。",
+            "适用于配备 Touch Bar 的 MacBook Pro。"], illustration: "touchBar43"),
+        .init(id: "fullwidth", title: "全宽切换", subtitle: "设置 → Touch Bar", symbol: "arrow.left.and.right", points: [
+            "闲置后可自动显示全宽歌词。",
+            "轻触歌词或空白可显示右侧控制条。"], illustration: "touchBarModes"),
+        .init(id: "translation", title: "双语显示", subtitle: "设置 → 歌词 / Touch Bar", symbol: "character.bubble", points: [
+            "Touch Bar 原文与译文左右显示。",
+            "翻译可在歌词、Touch Bar 和悬浮窗设置中调整。"], illustration: "touchBarTranslation"),
+        .init(id: "overlay", title: "桌面歌词", subtitle: "设置 → 悬浮窗", symbol: "rectangle.on.rectangle", points: [
+            "悬浮歌词可显示在其他窗口上方。",
+            "悬浮窗可解锁拖动，并支持点击穿透。"], illustration: "overlay"),
+        .init(id: "fonts", title: "字体与外观", subtitle: "设置 → 外观 / 字体与颜色", symbol: "paintpalette", points: [
+            "主窗口与悬浮窗的字体、配色和材质可在设置中调整。",
+            "Touch Bar 使用白色常规字体。"], illustration: "font"),
+        .init(id: "help", title: "使用说明", subtitle: "设置 → 使用说明", symbol: "book.closed", points: [
+            "可在设置中按主题查看使用说明。",
+            "设置支持功能搜索。"], illustration: "manual")
     ]
     static let manual: [GuidePage] = [
-        .init(id: "start", title: "播放音乐，歌词自动出现", subtitle: "先播放一首歌", symbol: "play.circle", points: [
-            "打开 Apple Music、Spotify、网易云或 QQ 音乐播放歌曲，即可自动同步歌词。自动识别不包含浏览器。",
-            "没有识别到播放器？前往“设置 → 播放器”选择来源或重新连接。系统询问控制播放器的权限时，请允许。",
-            "应用会自动搜索歌词；开启“自动保存歌词缓存”时保存在本机。等待歌词时显示三个点，纯音乐或没有歌词时显示歌曲信息。"], illustration: "player"),
-        .init(id: "main", title: "主窗口与菜单栏", subtitle: "播放、切歌和查看歌词", symbol: "text.quote", points: [
-            "点击歌词可跳到那一句；底部可以播放、暂停、切歌和拖动进度。在“设置 → 歌词 → 文字”可将主窗口当前歌词设为居中、上方或自定义百分比（5%–95%，越小越靠上），手动滚动后可返回正在唱的地方。",
-            "关闭主窗口也能继续看悬浮歌词。菜单栏歌词、Dock 图标和登录启动，可在“设置 → 通用”调整。",
-            "默认 ⌥⌘O 打开主窗口，⌥⌘L 显示或隐藏悬浮窗。在“设置 → 通用”可自定义或清除全局快捷键；清除后，可重新打开应用进入主窗口。"], illustration: "player"),
-        .init(id: "search", title: "选择合适的歌词", subtitle: "点击放大镜，或按 ⌘F", symbol: "magnifyingglass", points: [
-            "输入歌名或歌手，点“预览”查看效果，再点“应用当前歌词”使用。列表会保持打开，方便继续挑选。",
-            "“完整搜索”会查找更多版本，但可能需要更久；平时保持关闭即可。",
-            "在“设置 → 搜索”调整来源顺序、逐字或双语优先。Apple Music 云端歌词需在“设置 → 搜索”主动开启并登录，歌词格式取决于歌曲。改好后可对当前歌曲重新搜索。"], illustration: "search"),
-        .init(id: "overlay", title: "把歌词放在桌面上", subtitle: "设置 → 悬浮窗", symbol: "rectangle.on.rectangle", points: [
-            "悬浮窗显示在其他窗口上方，可随长句自动换行并平滑调整高度。关闭波形时歌词内容会在玻璃窗中居中；关闭自动高度后可手动调整宽度。",
-            "解锁后拖动窗口，锁定后避免误拖。“点击穿透”让你直接操作后面的应用，并自动锁定位置。",
-            "锁定时可开启“鼠标经过时隐藏”，离开后恢复。也可以选择暂停播放时隐藏。"], illustration: "overlay"),
-        .init(id: "waveform", title: "可选的悬浮窗音频波形", subtitle: "设置 → 悬浮窗", symbol: "waveform", points: [
-            "实时波形需要 macOS 26 或更新版本，默认关闭。开启后可选择白色或封面彩色，波形沿悬浮窗底部显示。",
-            "首次开启可能需要 macOS 系统音频录制权限。仅尝试读取当前识别播放器的音频；暂停、隐藏和减少动态效果时停止。",
-            "这里显示固定的示意帧，打开指南不会读取音频。权限或音频不可用时，可在设置中查看状态并重试。"], illustration: "releaseWaveform38"),
-        .init(id: "style", title: "选择喜欢的背景", subtitle: "设置 → 外观，两种材质实时预览", symbol: "square.on.square", points: [
-            "Liquid Glass 使用高透玻璃、原生亮边与边缘折射，保持统一外观；磨砂阅读可单独选择深色、浅色或跟随系统。",
-            "Liquid Glass 的透明度调节用于减淡底色，保留完整折射；磨砂阅读还可调节磨砂强度。",
-            "实际效果会随桌面背景变化。系统开启“降低透明度”时，会使用实色背景。"], illustration: "style"),
-        .init(id: "fonts", title: "换上喜欢的字体", subtitle: "设置 → 字体与颜色", symbol: "textformat", points: [
-            "选择此 Mac 已安装的字体，主窗口和悬浮窗会一起更换，设置中可实时预览排版。",
-            "主窗口、悬浮窗、翻译和下一句的字号可分别调整。缺少字符或字体被卸载时，会使用系统字体。",
-            "点击“恢复字体与颜色”可回到默认外观。"], illustration: "font"),
-        .init(id: "colors", title: "原文与辅助文字分别选色", subtitle: "设置 → 字体与颜色", symbol: "paintpalette", points: [
-            "“当前歌词颜色”控制原文；“翻译与下一句颜色”控制辅助文字，两组颜色可分别设置。",
-            "修改后立即生效并保存。Liquid Glass 使用自定义颜色或封面配色时不额外改色，恢复默认配色后自动优化可读性。",
-            "若手动颜色选项变灰，请先关闭“跟随封面主题色”。"], illustration: "colors"),
-        .init(id: "wordColors", title: "已唱与未唱，用不同颜色", subtitle: "设置 → 歌词 → 逐字独立配色", symbol: "character.cursor.ibeam", points: [
-            "开启“逐字独立配色”，分别选择已唱到和未唱到的颜色，演唱进度会在两种颜色间推进。",
-            "只对带逐字时间的歌词生效，仍保留轻微放大和长音辉光。普通逐行歌词使用原文颜色。",
-            "关闭独立配色会恢复明暗高亮，已选的两种颜色会保留。"], illustration: "wordColors"),
-        .init(id: "theme", title: "让歌词跟随封面配色", subtitle: "设置 → 歌词 → 跟随封面主题色", symbol: "photo", points: [
-            "开启后从封面提取最多四种代表色：原文与辅助文字分别配色，已唱部分更明亮，未唱部分较暗。彩色波形使用多色渐变，切歌时自动更新。",
-            "没有封面时使用中性配色。自动配色优先于手动颜色，但不会覆盖它们，关闭即可恢复。",
-            "主窗口背景也会随封面变化。背景与歌词的配色分别处理，关闭歌词跟色不会关掉封面背景。"], illustration: "theme"),
-        .init(id: "text", title: "翻译、下一句与简繁体", subtitle: "设置 → 歌词", symbol: "text.alignleft", points: [
-            "开启翻译总开关后，在“设置 → 悬浮窗 → 翻译与下一句”选择显示内容。悬浮窗原文、翻译行距和段间距在同页的“悬浮窗文字间距”调整。",
-            "“翻译或下一句”会在没有翻译时显示下一句；“仅翻译”则留空。下一句换到当前句时会平滑上移。",
-            "可选择原文、简体或繁体显示，简繁转换后仍保留逐字进度。"], illustration: "conversion"),
-        .init(id: "effects", title: "让歌词随演唱亮起来", subtitle: "设置 → 动效", symbol: "sparkles", points: [
-            "带逐字时间的歌词会依次提亮、轻微放大，慢唱和长音还会柔和发光。普通逐行歌词没有这些效果。",
-            "EDR 辉光增强可让高光更亮，实际效果取决于屏幕。它不会改变系统亮度；不支持时使用普通辉光。",
-            "喜欢安静的画面，可开启应用的“减少动态效果”；系统的同名设置也会生效，位移与辉光会停稳。在开发者选项中可选跟随屏幕（120 Hz 屏幕可请求 120 帧）、固定 60 帧或智能节能；实际帧率由系统决定。"], illustration: "effects"),
-        .init(id: "timing", title: "让歌词与音乐对齐", subtitle: "每首歌都会记住调整", symbol: "slider.horizontal.3", points: [
-            "歌词慢了，用正偏移提前；歌词快了，用负偏移延后。底部每次调整 0.1 秒，点击数值即可重置。",
-            "所有歌曲都有同样偏差时，在“设置 → 歌词同步”调整通用偏移，再按歌曲微调。两者相加，分别重置；⌥⌘↑／↓ 仍每次调整单曲 0.2 秒。",
-            "歌词版本不对时可重新搜索。菜单栏 → 歌词还可以停用某首歌或整张专辑的搜索，需要时再恢复。"], illustration: "timing"),
-        .init(id: "library", title: "使用自己的歌词文件", subtitle: "点击书本图标打开资料库", symbol: "books.vertical", points: [
-            "开启“自动保存歌词缓存”时，获取的歌词保存在本地，下次播放优先使用。资料库查看已有文件，不另建数据库。",
-            "把 LRC 或 LRCX 文件拖入主窗口，即可替换当前歌词。LRCX 可保留翻译和逐字效果；导出纯文本则不保留时间。",
-            "在“歌词 → 缓存与资料库”可关闭自动保存或将现有歌词移到废纸篓。更换保存位置、导出和写入 Apple Music 等操作在开发者选项中。更换位置不会自动搬移文件；写入 Apple Music 可能覆盖原歌词。"], illustration: "library"),
-        .init(id: "flexbar", title: "可选的 Flexbar 歌词", subtitle: "设置 → 开发者选项 → Flexbar", symbol: "rectangle.on.rectangle", points: [
-            "需要另行安装并配置 FlexDesigner 歌词插件，然后在开发者选项中开启 Flexbar 连接。普通歌词和悬浮窗不需要此功能。",
-            "插件可显示逐字歌词与翻译；这里展示插件渲染器生成的图片，不代表设备上的实际显示帧率或亮度。",
-            "暂停、隐藏或没有歌词时会减少更新。设备与插件的实际表现可能不同。"], illustration: "releaseFlexbar38"),
-        .init(id: "touchbar", title: "MacBook Pro 的 Touch Bar 歌词", subtitle: "设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
-            "配备内置 Touch Bar 的 MacBook Pro 可显示白色常规字体歌词，无需插件或独立助手。在“设置 → Touch Bar”开启。",
-            "长句只在超出显示范围时滚动。暂停、跳转和单曲／通用偏移直接跟随主软件。翻译在左右两栏显示。",
-            "开启后台显示后切到其他应用仍可看歌词。可选闲置 1–15 秒后自动全宽，点按歌词或空白恢复歌词与系统控制条；也可打开屏幕预览。"], illustration: "touchBar43"),
-        .init(id: "privacy", title: "帮助与更新", subtitle: "设置 → 关于，可随时重看", symbol: "info.circle", points: [
-            "搜索时会向启用的歌词来源发送歌名、歌手和时长。不需要的来源可在设置中关闭。",
-            "实时波形需在“设置 → 悬浮窗”主动开启，首次使用可能请求系统音频录制权限；打开本指南不会采集音频。开发者选项包含文件管理、来源令牌、帧率与可选 Flexbar 连接。来源令牌保存在系统钥匙串中。",
-            "菜单栏可查看上游项目更新，本地定制版不通过该入口更新。教程和更新介绍只自动显示一次，以后可在“设置 → 关于”重新查看。"], illustration: "privacy")
+        .init(id: "start", title: "播放音乐", subtitle: "设置 → 播放器", symbol: "play.circle", points: [
+            "网易云、Apple Music、Spotify 和 QQ 音乐支持自动歌词同步。",
+            "未识别到歌曲时，可在播放器设置中选择来源。"], illustration: "player"),
+        .init(id: "main", title: "窗口与快捷键", subtitle: "主窗口 / 设置 → 通用", symbol: "text.quote", points: [
+            "点击歌词可跳转，底部控制播放和进度。",
+            "⌥⌘O 打开主窗口，⌥⌘L 切换悬浮窗；快捷键可在通用设置修改。"], illustration: "player"),
+        .init(id: "search", title: "搜索歌词", subtitle: "设置 → 搜索", symbol: "magnifyingglass", points: [
+            "⌘F 可打开搜索，预览后可应用当前歌词。",
+            "来源与匹配偏好在搜索设置调整；Apple Music 云端歌词需开启并登录。"], illustration: "search"),
+        .init(id: "overlay", title: "桌面悬浮窗", subtitle: "设置 → 悬浮窗", symbol: "rectangle.on.rectangle", points: [
+            "悬浮窗解锁后可拖动，锁定后可开启点击穿透。",
+            "可选择鼠标经过或暂停时隐藏，也能调整宽度与自动高度。"], illustration: "overlay"),
+        .init(id: "waveform", title: "实时波形", subtitle: "设置 → 悬浮窗", symbol: "waveform", points: [
+            "实时波形支持白色和封面配色，可在设置中开启。",
+            "首次可能请求系统音频录制权限；暂停或隐藏时停止采集。"], illustration: "releaseWaveform38"),
+        .init(id: "style", title: "背景与材质", subtitle: "设置 → 外观", symbol: "square.on.square", points: [
+            "可选择 Liquid Glass 或磨砂阅读，并调整透明度。",
+            "磨砂阅读可选择深浅外观；实际效果随桌面背景变化。"], illustration: "style"),
+        .init(id: "fonts", title: "字体与字号", subtitle: "设置 → 字体与颜色", symbol: "textformat", points: [
+            "字体及主窗口、悬浮窗和辅助文字的字号可分别调整。",
+            "Touch Bar 使用固定的白色常规字体。"], illustration: "font"),
+        .init(id: "colors", title: "原文与辅助颜色", subtitle: "设置 → 字体与颜色", symbol: "paintpalette", points: [
+            "原文、翻译与下一句可分别选色。",
+            "关闭“跟随封面主题色”后，可手动选色。"], illustration: "colors"),
+        .init(id: "wordColors", title: "逐字配色", subtitle: "设置 → 字体与颜色", symbol: "character.cursor.ibeam", points: [
+            "逐字独立配色可分别设置已唱和未唱的颜色。",
+            "需要歌词带逐字时间；关闭后恢复明暗高亮。"], illustration: "wordColors"),
+        .init(id: "theme", title: "封面配色", subtitle: "设置 → 字体与颜色", symbol: "photo", points: [
+            "跟随封面主题色可在切歌时自动换色。",
+            "没有封面时使用中性配色；关闭后恢复手动颜色。"], illustration: "theme"),
+        .init(id: "text", title: "翻译与简繁体", subtitle: "设置 → 歌词 / 悬浮窗", symbol: "text.alignleft", points: [
+            "歌词设置支持翻译与简繁体；悬浮窗可显示翻译或下一句。",
+            "Touch Bar 的翻译开关在 Touch Bar 设置中，原文和译文左右显示。"], illustration: "conversion"),
+        .init(id: "effects", title: "动效与辉光", subtitle: "设置 → 动效", symbol: "sparkles", points: [
+            "可调整逐字放大、长音辉光和换句动画。",
+            "开启“减少动态效果”可减少运动；辉光亮度取决于屏幕。"], illustration: "effects"),
+        .init(id: "timing", title: "歌词同步", subtitle: "设置 → 歌词同步", symbol: "slider.horizontal.3", points: [
+            "正偏移提前歌词，负偏移延后歌词。",
+            "单曲在播放界面微调；所有歌曲都有偏差时调整通用偏移。"], illustration: "timing"),
+        .init(id: "library", title: "缓存与文件", subtitle: "设置 → 歌词 → 缓存与资料库", symbol: "books.vertical", points: [
+            "可关闭自动保存，或将现有歌词缓存移到废纸篓。",
+            "书本图标打开资料库；将 LRC 或 LRCX 拖入主窗口可使用自己的歌词。"], illustration: "library"),
+        .init(id: "flexbar", title: "Flexbar", subtitle: "设置 → 开发者选项 → Flexbar", symbol: "rectangle.on.rectangle", points: [
+            "Flexbar 连接需要先安装并配置 FlexDesigner 插件。",
+            "内置 Touch Bar 的歌词直接在 Touch Bar 设置开启。"], illustration: "releaseFlexbar38"),
+        .init(id: "touchbar", title: "Touch Bar", subtitle: "设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
+            "后台显示可在切换应用后保留歌词。",
+            "闲置后可自动全宽，轻触歌词或空白唤回控制条；原文与翻译左右显示。"], illustration: "touchBar43"),
+        .init(id: "privacy", title: "隐私与帮助", subtitle: "设置 → 搜索 / 关于", symbol: "info.circle", points: [
+            "歌词搜索会向已启用来源发送歌名、歌手和时长，可自行关闭来源。",
+            "可选联网功能附隐私说明；在“关于”可重看入门介绍和本次更新。"], illustration: "manual")
     ]
     // Add new release entries here; a version jump includes every intervening
     // entry, while a first upgrade from versions without receipts gets a recap.
@@ -227,12 +207,12 @@ enum GuideContent {
             "改善部分 QQ 音乐歌词的读取、搜索与封面显示；修复缓存文件变化及异常设置值引起的显示问题。"], illustration: "conversion"))
     ]
     static let release43Pages: [GuidePage] = [
-        .init(id: "touchBar43", title: "Touch Bar 歌词", subtitle: "TB.5.2 · 设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
+        .init(id: "touchBar43", title: "Touch Bar 歌词", subtitle: "TB.5.3 · 设置 → Touch Bar", symbol: "rectangle.bottomthird.inset.filled", points: [
             "支持后台、自动全宽与左右翻译。新安装时由你选择开启。",
             "本版要求 macOS 26 或更新系统。"], illustration: "touchBar43"),
-        .init(id: "backgroundTouchBar43", title: "介绍更简短，说明随时查", subtitle: "TB.5.2 · 设置 → 使用说明", symbol: "book.closed", points: [
-            "首次介绍精简为 8 页图文，播放音乐后即可开始使用。",
-            "详细操作集中到设置里的“使用说明”，可按主题查看。"], illustration: "manual")
+        .init(id: "backgroundTouchBar43", title: "介绍更简短，说明随时查", subtitle: "TB.5.3 · 设置 → 使用说明", symbol: "book.closed", points: [
+            "首次介绍为 7 页图文，使用简短的陈述句。",
+            "“使用说明”的 17 个主题均缩成两句，并保留操作路径与配图。"], illustration: "manual")
     ]
     static let release42Pages: [GuidePage] = [
         .init(id: "globalOffset42", title: "通用歌词偏移", subtitle: "新增 · 设置 → 歌词同步", symbol: "slider.horizontal.3", points: [
@@ -461,7 +441,7 @@ struct FeatureGuideView: View {
                         navigation.scrollTo(pages[value].id)
                     }
                 }
-                Text("设置自动保存 · 可随时重看").font(.caption).foregroundStyle(.secondary)
+                Text("可在“关于”中重看介绍").font(.caption).foregroundStyle(.secondary)
             }.padding(16).frame(width: guideSize.size.width < 900 ? 184 : 205).background(.quaternary.opacity(0.25))
             Divider()
             VStack(alignment: .leading, spacing: 0) {

@@ -56,7 +56,7 @@ struct GuideIllustration: View {
                 }.pickerStyle(.segmented).frame(maxWidth: 340)
             } else if colored {
                 HStack(spacing: 10) {
-                    Text(kind == "theme" ? "封面示意" : "试试配色").font(.caption)
+                    Text(kind == "theme" ? "封面示意" : "配色示例").font(.caption)
                     ForEach(Self.palettes.indices, id: \.self) { index in
                         let p = Self.palettes[index]
                         Button { palette = index } label: {
@@ -104,7 +104,7 @@ struct GuideIllustration: View {
         }.padding(12)
     }
     private var navigationExample: some View {
-        let labels = kind == "manual" ? ["打开设置", "使用说明", "选择主题"] : kind == "library" ? ["导入歌词", "保留时间", "本地资料库"] :
+        let labels = kind == "manual" ? ["设置入口", "使用说明", "主题分类"] : kind == "library" ? ["导入歌词", "保留时间", "本地资料库"] :
             kind == "guide" ? ["首次使用", "本次更新", "关于 · 重看"] :
             kind == "settings" ? ["常用设置", "动态预览", "开发者选项"] : ["设置", "本地保存", "关于"]
         let symbols = kind == "manual" ? ["slider.horizontal.3", "book.closed", "list.bullet"] : kind == "library" ? ["doc.text", "clock", "books.vertical"] :
@@ -140,8 +140,8 @@ private struct GuideSearchIllustration: View {
                 }
             }.frame(maxWidth: .infinity)
             VStack(spacing: 9) {
-                Text(preview == nil ? "先点左侧预览" : "歌词预览").font(.caption).foregroundStyle(.white.opacity(0.7))
-                Text(preview == nil ? "选好后再应用" : preview == 0 ? "歌词与音乐同步" : "每个字，清楚呈现")
+                Text(preview == nil ? "可预览歌词" : "歌词预览").font(.caption).foregroundStyle(.white.opacity(0.7))
+                Text(preview == nil ? "可应用已选版本" : preview == 0 ? "歌词与音乐同步" : "每个字，清楚呈现")
                     .font(.callout.weight(.semibold)).multilineTextAlignment(.center)
                 if preview == 0 { Text("Lyrics in sync").font(.caption2).foregroundStyle(.white.opacity(0.7)) }
                 Button(applied != nil && applied == preview ? "已应用" : "应用当前歌词") { applied = preview }

@@ -5,9 +5,9 @@
 An unofficial Touch Bar edition based on [LyricsX Next](https://github.com/wzk112/LyricsX-Next).
 
 
-[Direct download: TB.5.2 stable ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.2/LyricsX-TB-2.0.43-tb.5.2-arm64.zip) — macOS 26 or later · Apple silicon only.
+[Direct download: TB.5.3 stable ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.3/LyricsX-TB-2.0.43-tb.5.3-arm64.zip) — macOS 26 or later · Apple silicon only.
 
-[Installation and troubleshooting](INSTALL.md) · [Older releases](releases/HISTORY.md)
+[Installation and troubleshooting](INSTALL.md) · [Changelog](CHANGELOG.md)
 
 ## Improvements over LyricsX Next
 
