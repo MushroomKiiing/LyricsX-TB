@@ -97,10 +97,12 @@ private struct GuideMotionTestHost: View {
         #expect(GuideContent.updates(after: "2.0.34").map(\.id) == GuideContent.release43Pages.map(\.id) + GuideContent.release42Pages.map(\.id) + GuideContent.release41Pages.map(\.id) + GuideContent.release40Pages.map(\.id) + release39 + latest + current)
         #expect(GuideContent.updates(after: "2.0.28").count == 36)
         #expect(GuideContent.updates(after: nil).count == 36)
-        #expect(GuideContent.tutorial.count == 17)
+        #expect(GuideContent.tutorial.count == 8)
+        #expect(GuideContent.tutorial.allSatisfy { $0.points.count <= 2 && $0.points.joined().count <= 90 && !$0.illustration.isEmpty })
+        #expect(GuideContent.manual.count == 17)
         #expect(Set(GuideContent.tutorial.map(\.id)).count == GuideContent.tutorial.count)
-        #expect(GuideContent.tutorial.contains { $0.id == "waveform" && $0.illustration == "releaseWaveform38" })
-        #expect(GuideContent.tutorial.contains { $0.id == "flexbar" && $0.illustration == "releaseFlexbar38" })
+        #expect(GuideContent.manual.contains { $0.id == "waveform" && $0.illustration == "releaseWaveform38" })
+        #expect(GuideContent.manual.contains { $0.id == "flexbar" && $0.illustration == "releaseFlexbar38" })
         #expect(GuideContent.updates(after: "2.0.37").suffix(4).map(\.illustration) == [
             "releaseWaveform38", "releaseOverlay38", "livePlayer", "releaseFlexbar38"])
         let waveform = GuideContent.releases.first { $0.page.id == "waveform38" }!.page
@@ -182,15 +184,15 @@ private struct GuideMotionTestHost: View {
 
     @Test func build279IntroducesTouchBarOnceWithoutEnablingItOrChangingExistingSettings() throws {
         let current = ["touchBar43", "backgroundTouchBar43"]
-        #expect(GuideContent.revision == "touch-bar-tb6-launch-fix")
+        #expect(GuideContent.revision == "compact-guide-tb52")
         #expect(GuideContent.release43Pages.map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.42").map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.43").map(\.id) == current)
         #expect(GuideContent.displayUpdates(after: "2.0.41").map(\.id) == current + ["globalOffset42", "startup42"])
-        #expect(GuideContent.release43Pages.allSatisfy { $0.subtitle.contains("设置 →") && $0.points.joined().contains("默认关闭") })
-        #expect(GuideContent.release43Pages.last?.points.joined().contains("随网易云启动") == true)
-        #expect(GuideContent.release43Pages.last?.points.joined().contains("macOS 15 Sequoia") == true)
-        #expect(GuideContent.release43Pages.first?.points.joined().contains("1–15 秒") == true)
+        #expect(GuideContent.release43Pages.allSatisfy { $0.subtitle.contains("设置 →") && $0.points.count <= 2 })
+        #expect(GuideContent.release43Pages.last?.points.joined().contains("使用说明") == true)
+        #expect(GuideContent.release43Pages.first?.points.joined().contains("macOS 26") == true)
+        #expect(GuideContent.manual.first { $0.id == "touchbar" }?.points.joined().contains("1–15 秒") == true)
         #expect(GuideContent.tutorial.contains { $0.id == "touchbar" && $0.illustration == "touchBar43" })
         for previous in ["2.0.42", "2.0.40"] {
             try fixture { defaults in
@@ -210,7 +212,7 @@ private struct GuideMotionTestHost: View {
                 let presented = defaults.stringArray(forKey: "guidePresentedEditions") ?? []
                 history.didPresent()
                 #expect(defaults.stringArray(forKey: "guidePresentedEditions") == presented)
-                #expect(presented.contains("2.0.43:touch-bar-tb6-launch-fix"))
+                #expect(presented.contains("2.0.43:compact-guide-tb52"))
             }
         }
         try fixture { defaults in
@@ -224,9 +226,9 @@ private struct GuideMotionTestHost: View {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let plist = try #require(PropertyListSerialization.propertyList(from: Data(contentsOf: root.appendingPathComponent("Resources/Info.plist")), format: nil) as? [String: Any])
         #expect(plist["CFBundleShortVersionString"] as? String == GuideContent.version)
-        #expect(plist["CFBundleVersion"] as? String == "279.14")
-        #expect(plist["LyricsXReleaseVersion"] as? String == "2.0.43-TB.6-preview.3")
-        #expect(plist["LSMinimumSystemVersion"] as? String == "15.0")
+        #expect(plist["CFBundleVersion"] as? String == "279.15")
+        #expect(plist["LyricsXReleaseVersion"] as? String == "2.0.43-TB.5.2")
+        #expect(plist["LSMinimumSystemVersion"] as? String == "26.0")
     }
 
     @Test(.enabled(if: ProcessInfo.processInfo.environment["LYRICSX_RELEASE_QA"] == "1"))

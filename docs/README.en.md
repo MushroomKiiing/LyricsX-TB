@@ -4,9 +4,8 @@
 
 An unofficial Touch Bar edition based on [LyricsX Next](https://github.com/wzk112/LyricsX-Next).
 
-**[Download TB.6 compatibility preview](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.3/LyricsX-TB-2.0.43-tb.6-preview.3-universal.zip)** — macOS 15 or later · Apple silicon (including M1) and Intel.
 
-[Direct download: TB.5.1 stable ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.1/LyricsX-TB-2.0.43-tb.5.1-arm64.zip) — macOS 26 or later · Apple silicon only.
+[Direct download: TB.5.2 stable ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.2/LyricsX-TB-2.0.43-tb.5.2-arm64.zip) — macOS 26 or later · Apple silicon only.
 
 [Installation and troubleshooting](INSTALL.md) · [Older releases](releases/HISTORY.md)
 
@@ -16,13 +15,14 @@ An unofficial Touch Bar edition based on [LyricsX Next](https://github.com/wzk11
 - **Playback and artwork:** improved NetEase playback sync and optional high-resolution artwork matching (NetEase only).
 - **Startup and privacy:** launch with NetEase and privacy explanations for optional online features.
 - **Cache management:** optional automatic caching, cache cleanup and a lyric library.
-- **Settings and appearance:** settings search, clearer categories, and improved translation and styling controls.
+- **Settings and appearance:** settings search, clearer categories, a concise introduction and a dedicated manual, with improved translation and styling controls.
+
+Requires macOS 26 or later on Apple silicon. The app is not notarized by Apple.
 
 ## Installation
 
 Download the app ZIP linked above, unzip it, and move **LyricsX TB.app** to Applications. No Codex, source code or developer tools are needed. Enable lyrics in Settings → Touch Bar.
 
-The compatibility preview has not been tested on a physical Mac running macOS 15. The packages are not notarized by Apple.
 
 ## Credits and license
 

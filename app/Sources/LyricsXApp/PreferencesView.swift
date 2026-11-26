@@ -6,7 +6,7 @@ enum SettingsSection: String, CaseIterable, Identifiable, Sendable {
     case general = "通用", lyrics = "歌词", sync = "歌词同步", sources = "搜索"
     case player = "播放器", overlay = "悬浮窗", touchBar = "Touch Bar"
     case appearance = "外观", typography = "字体与颜色", effects = "动效"
-    case developer = "开发者选项", about = "关于"
+    case manual = "使用说明", developer = "开发者选项", about = "关于"
     var id: String { rawValue }
     var symbol: String {
         switch self {
@@ -21,6 +21,7 @@ enum SettingsSection: String, CaseIterable, Identifiable, Sendable {
         case .effects: "waveform"
         case .sources: "magnifyingglass"
         case .developer: "curlybraces"
+        case .manual: "book.closed"
         case .about: "info.circle"
         }
     }
@@ -37,6 +38,7 @@ enum SettingsSection: String, CaseIterable, Identifiable, Sendable {
         case .effects: "换句、逐字和长音的视觉效果。"
         case .sources: "选择歌词来源与版本偏好。"
         case .developer: "歌词文件、访问令牌和批量数据操作。"
+        case .manual: "按主题查看详细图文操作说明。"
         case .about: "版本、开源项目与许可。"
         }
     }
@@ -50,7 +52,7 @@ enum SettingsGroup: String, CaseIterable, Identifiable {
         case .common: [.general, .lyrics, .sync, .sources]
         case .displays: [.player, .overlay, .touchBar]
         case .appearance: [.appearance, .typography, .effects]
-        case .other: [.developer, .about]
+        case .other: [.manual, .developer, .about]
         }
     }
 }
@@ -338,6 +340,7 @@ struct PreferencesView: View {
         case .effects: effectSettings
         case .sources: sourceSettings
         case .developer: developerSettings
+        case .manual: GuideManualSettingsView(model: model)
         case .about: aboutSettings
         }
     }
@@ -724,7 +727,7 @@ struct PreferencesView: View {
                 Image(systemName: "quote.bubble.fill").font(.largeTitle).foregroundStyle(.pink)
             }
             SettingRow(title: "项目与署名", detail: "本地修改分支，基于 Zikai Wang（wzk112）的 LyricsX-Next 2.0.43；原项目 ddddxxx/LyricsX 与 MxIris-LyricsX-Project/LyricsX。保留 MPL-2.0 与依赖许可，不代表原作者发布或背书。") { EmptyView() }
-            SettingRow(title: "使用指南", detail: "从连接播放器到搜索、悬浮窗、自定义、同步与文件管理，完整图文教程。") {
+            SettingRow(title: "使用指南", detail: "8 页简短图文介绍；详细操作见左侧“使用说明”。") {
                 Button("查看教程") { model.showFeatureGuide?(true) }
             }
             SettingRow(title: "本次更新", detail: "重新查看当前版本新增的功能、修复和优化。") {

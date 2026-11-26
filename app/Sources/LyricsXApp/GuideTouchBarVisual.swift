@@ -2,8 +2,7 @@ import AppKit
 import SwiftUI
 import LyricsXCore
 
-/// The shipping Touch Bar view, with a fixed illustrative lyric and no actions
-/// or timers. Opening an introduction does not enable system Touch Bar access.
+/// Fixed examples use the shipping lyric view without system Touch Bar access.
 enum GuideTouchBarExample {
     static let line = LyricLine(id: 0, time: 0, text: "让每一句歌词，跟着音乐前进", words: [
         .init(text: "让每一句", start: 0, end: 2),
@@ -15,15 +14,17 @@ enum GuideTouchBarExample {
 }
 
 struct GuideTouchBarVisual: View {
+    var showsModes = false
+    var showsTranslation = false
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("MacBook Pro Touch Bar").font(.headline)
-            GuideTouchBarNativeView()
-                .frame(height: 30)
-                .padding(10)
-                .background(.black, in: .rect(cornerRadius: 12))
-                .allowsHitTesting(false)
-            Text("正式控件 · 固定演示歌词 · 非实体 Touch Bar 画面")
+        VStack(alignment: .leading, spacing: 10) {
+            Text(showsModes ? "闲置后 · 全宽歌词" : "MacBook Pro Touch Bar").font(.headline)
+            bar(includesControls: false)
+            if showsModes {
+                Text("轻触后 · 歌词与系统控制条").font(.headline)
+                bar(includesControls: true)
+            }
+            Text("界面示意 · 使用实际歌词控件")
                 .font(.caption).foregroundStyle(.secondary)
         }
         .padding(16)
@@ -31,11 +32,29 @@ struct GuideTouchBarVisual: View {
         .background(.quaternary.opacity(0.4))
         .accessibilityElement(children: .combine)
     }
+    private func bar(includesControls: Bool) -> some View {
+        HStack(spacing: 14) {
+            GuideTouchBarNativeView(showsTranslation: showsTranslation)
+                .frame(maxWidth: .infinity)
+            if includesControls {
+                Image(systemName: "sun.max.fill")
+                Image(systemName: "speaker.wave.2.fill")
+            }
+        }
+        .foregroundStyle(.white)
+        .frame(height: 30)
+        .padding(10)
+        .background(.black, in: .rect(cornerRadius: 12))
+        .allowsHitTesting(false)
+    }
 }
 
 struct GuideTouchBarNativeView: NSViewRepresentable {
+    var showsTranslation = false
     func makeNSView(context: Context) -> LyricView { LyricView(frame: .zero) }
     func updateNSView(_ view: LyricView, context: Context) {
-        view.update(GuideTouchBarExample.line.text, playing: false)
+        view.update(showsTranslation ? "跟着音乐前进" : GuideTouchBarExample.line.text,
+                    playing: false, translation: showsTranslation ? "Let the music lead" : nil,
+                    showsTranslation: showsTranslation)
     }
 }

@@ -32,7 +32,7 @@ struct GuideIllustration: View {
                 startPoint: .topLeading, endPoint: .bottomTrailing)
             if kind == "search" {
                 GuideSearchIllustration().padding(14)
-            } else if ["library", "privacy", "settings", "guide"].contains(kind) {
+            } else if ["library", "privacy", "settings", "guide", "manual"].contains(kind) {
                 navigationExample
             } else {
                 lyricExample
@@ -104,10 +104,10 @@ struct GuideIllustration: View {
         }.padding(12)
     }
     private var navigationExample: some View {
-        let labels = kind == "library" ? ["导入歌词", "保留时间", "本地资料库"] :
+        let labels = kind == "manual" ? ["打开设置", "使用说明", "选择主题"] : kind == "library" ? ["导入歌词", "保留时间", "本地资料库"] :
             kind == "guide" ? ["首次使用", "本次更新", "关于 · 重看"] :
             kind == "settings" ? ["常用设置", "动态预览", "开发者选项"] : ["设置", "本地保存", "关于"]
-        let symbols = kind == "library" ? ["doc.text", "clock", "books.vertical"] :
+        let symbols = kind == "manual" ? ["slider.horizontal.3", "book.closed", "list.bullet"] : kind == "library" ? ["doc.text", "clock", "books.vertical"] :
             kind == "guide" ? ["book.closed", "sparkles", "info.circle"] : ["slider.horizontal.3", "eye", "curlybraces"]
         return HStack(spacing: 14) {
             ForEach(labels.indices, id: \.self) { index in

@@ -32,7 +32,7 @@ check_binary() {
     path="${path%% (compatibility version*}"
     case "$path" in
       */libswift_errno.dylib)
-        echo "Incompatible runtime dependency: $path in $binary (macOS 15)." >&2
+        echo "Incompatible runtime dependency: $path in $binary (macOS 26)." >&2
         failed=1
         ;;
       @rpath/*)

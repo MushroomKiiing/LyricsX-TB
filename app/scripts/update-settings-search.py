@@ -65,6 +65,7 @@ def records():
                           ('lyrics','MainLyricPosition.swift'),('sources','AppleMusicCloudSettingsView.swift')]:
         collect(section, (APP/file).read_text())
     for record in [
+        ('manual','使用说明','详细图文教程，包含播放器、Touch Bar、悬浮窗、翻译、外观、歌词同步与缓存。'),
         ('general','悬浮歌词','设置显示或隐藏悬浮窗的全局快捷键。'),
         ('general','主窗口','设置打开主窗口的全局快捷键。'),
         ('sync','通用歌词偏移','以秒输入所有歌曲的歌词偏移，支持毫秒精度。'),

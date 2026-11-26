@@ -8,8 +8,7 @@
 
 ## 下载
 
-- **[直接下载正式版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.1/LyricsX-TB-2.0.43-tb.5.1-arm64.zip)**：macOS 26+，Apple 芯片。
-- **[直接下载兼容版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.6-preview.3/LyricsX-TB-2.0.43-tb.6-preview.3-universal.zip)**：macOS 15+，Apple 芯片（含 M1）和 Intel。仍在试用，macOS 15 实体 Touch Bar 待验证。
+- **[直接下载正式版 ZIP](https://github.com/MushroomKiiing/LyricsX-TB/releases/download/v2.0.43-tb.5.2/LyricsX-TB-2.0.43-tb.5.2-arm64.zip)**：macOS 26+，Apple 芯片。
 
 [安装与排查](docs/INSTALL.md) · [历史版本](docs/releases/HISTORY.md)
 
@@ -19,13 +18,12 @@
 - **播放与封面**：改善网易云播放同步，支持可选高清封面匹配（仅网易云）。
 - **启动与隐私**：支持随网易云启动，可选联网功能附隐私说明。
 - **缓存管理**：可关闭自动缓存，支持清理缓存和查看歌词资料库。
-- **设置与外观**：增加设置搜索、整理分类，完善翻译与字体颜色设置。
+- **设置与外观**：设置搜索与分类、简短入门及独立使用说明，完善翻译与字体颜色设置。
 
 ## 使用
 
-下载后将 LyricsX TB.app 放入“应用程序”，退出旧版后打开。在“设置 → Touch Bar”启用所需功能即可。
+下载后将 LyricsX TB.app 放入“应用程序”，退出旧版后打开。在“设置 → Touch Bar”启用所需功能即可。安装包尚未经过 Apple 公证。
 
-TB.6 的 macOS 15 实体 Touch Bar 待验证。安装包尚未经过 Apple 公证。
 
 ## 致谢与许可证
 
